@@ -1904,67 +1904,67 @@ struct {
 
 /* Networking "stack" initialization. */
 void modesInitNet(void) {
-    int j;
+    // int j;
 
-    memset(Modes.clients,0,sizeof(Modes.clients));
-    Modes.maxfd = -1;
+    // memset(Modes.clients,0,sizeof(Modes.clients));
+    // Modes.maxfd = -1;
 
-    for (j = 0; j < MODES_NET_SERVICES_NUM; j++) {
-        int s = anetTcpServer(Modes.aneterr, modesNetServices[j].port, NULL);
-        if (s == -1) {
-            fprintf(stderr, "Error opening the listening port %d (%s): %s\n",
-                modesNetServices[j].port,
-                modesNetServices[j].descr,
-                strerror(errno));
-            exit(1);
-        }
-        anetNonBlock(Modes.aneterr, s);
-        *modesNetServices[j].socket = s;
-    }
+    // for (j = 0; j < MODES_NET_SERVICES_NUM; j++) {
+    //     int s = anetTcpServer(Modes.aneterr, modesNetServices[j].port, NULL);
+    //     if (s == -1) {
+    //         fprintf(stderr, "Error opening the listening port %d (%s): %s\n",
+    //             modesNetServices[j].port,
+    //             modesNetServices[j].descr,
+    //             strerror(errno));
+    //         exit(1);
+    //     }
+    //     anetNonBlock(Modes.aneterr, s);
+    //     *modesNetServices[j].socket = s;
+    // }
 
-    signal(SIGPIPE, SIG_IGN);
+    // signal(SIGPIPE, SIG_IGN);
 }
 
 /* This function gets called from time to time when the decoding thread is
  * awakened by new data arriving. This usually happens a few times every
  * second. */
 void modesAcceptClients(void) {
-    int fd, port;
-    unsigned int j;
-    struct client *c;
+    // int fd, port;
+    // unsigned int j;
+    // struct client *c;
 
-    for (j = 0; j < MODES_NET_SERVICES_NUM; j++) {
-        fd = anetTcpAccept(Modes.aneterr, *modesNetServices[j].socket,
-                           NULL, &port);
-        if (fd == -1) {
-            if (Modes.debug & MODES_DEBUG_NET && errno != EAGAIN)
-                printf("Accept %d: %s\n", *modesNetServices[j].socket,
-                       strerror(errno));
-            continue;
-        }
+    // for (j = 0; j < MODES_NET_SERVICES_NUM; j++) {
+    //     fd = anetTcpAccept(Modes.aneterr, *modesNetServices[j].socket,
+    //                        NULL, &port);
+    //     if (fd == -1) {
+    //         if (Modes.debug & MODES_DEBUG_NET && errno != EAGAIN)
+    //             printf("Accept %d: %s\n", *modesNetServices[j].socket,
+    //                    strerror(errno));
+    //         continue;
+    //     }
 
-        if (fd >= MODES_NET_MAX_FD) {
-            close(fd);
-            return; /* Max number of clients reached. */
-        }
+    //     if (fd >= MODES_NET_MAX_FD) {
+    //         close(fd);
+    //         return; /* Max number of clients reached. */
+    //     }
 
-        anetNonBlock(Modes.aneterr, fd);
-        c = malloc(sizeof(*c));
-        c->service = *modesNetServices[j].socket;
-        c->fd = fd;
-        c->buflen = 0;
-        Modes.clients[fd] = c;
-        anetSetSendBuffer(Modes.aneterr,fd,MODES_NET_SNDBUF_SIZE);
+    //     anetNonBlock(Modes.aneterr, fd);
+    //     c = malloc(sizeof(*c));
+    //     c->service = *modesNetServices[j].socket;
+    //     c->fd = fd;
+    //     c->buflen = 0;
+    //     Modes.clients[fd] = c;
+    //     anetSetSendBuffer(Modes.aneterr,fd,MODES_NET_SNDBUF_SIZE);
 
-        if (Modes.maxfd < fd) Modes.maxfd = fd;
-        if (*modesNetServices[j].socket == Modes.sbsos)
-            Modes.stat_sbs_connections++;
+    //     if (Modes.maxfd < fd) Modes.maxfd = fd;
+    //     if (*modesNetServices[j].socket == Modes.sbsos)
+    //         Modes.stat_sbs_connections++;
 
-        j--; /* Try again with the same listening port. */
+    //     j--; /* Try again with the same listening port. */
 
-        if (Modes.debug & MODES_DEBUG_NET)
-            printf("Created new client %d\n", fd);
-    }
+    //     if (Modes.debug & MODES_DEBUG_NET)
+    //         printf("Created new client %d\n", fd);
+    // }
 }
 
 /* On error free the client, collect the structure, adjust maxfd if needed. */
