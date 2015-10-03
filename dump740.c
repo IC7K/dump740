@@ -47,7 +47,7 @@
 #include "anet.h"
 
 #define MODES_DEFAULT_RATE         2000000
-#define MODES_DEFAULT_FREQ         1090000000
+#define MODES_DEFAULT_FREQ         740000000
 #define MODES_DEFAULT_WIDTH        1000
 #define MODES_DEFAULT_HEIGHT       700
 #define MODES_ASYNC_BUF_NUMBER     12
