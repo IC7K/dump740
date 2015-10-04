@@ -1403,18 +1403,18 @@ void detectModeS(uint16_t *m, uint32_t mlen) {
 */
 //UVD_KOORD_KODE_LEN
 
-uint32_t mediana, minlevel, maxlevel;
+uint32_t mediana, minlevel, maxlevel, pulselevel;
 uint i, j;
 uint32_t hashval;
 
 //сканирование буффера длиной mlen
 for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
 
-    printf("VAL=%d", m[j]);
+    // printf("VAL=%d ", m[j]);
 
     //определение среднего значения в ряде периодов для выделения посылки над помехами
     mediana = 0;
-    minlevel = 255;
+    minlevel = 999;
     maxlevel = 0;
     for (i = 0; i < UVD_KOORD_KODE_LEN; i++) { 
         mediana+=m[j+i]; //SUMM(ALL)
@@ -1423,6 +1423,9 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
     }
     
     mediana/= UVD_KOORD_KODE_LEN;
+
+    pulselevel = (maxlevel-minlevel)/4+mediana;
+
     // printf("%d ", mediana);
 
     //выдение импульсов и подсчет хэша кода
@@ -1434,7 +1437,7 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
     hashval = 0;
     for (i = 0; i < UVD_KOORD_KODE_LEN; i++) { 
         //логическое выражение ? выражение 1 : выражение 2
-        hashval+=i*(m[j+i]>mediana ? 1 : 0);
+        hashval+=i*(m[j+i]>pulselevel ? 1 : 0);
     }
     // printf("%d ", hashval);
 
@@ -1472,19 +1475,19 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 32: //OK2+бедствие
-        printf("OK2 %d +emegency\n", hashval);
+        printf("OK2 %d +emergency\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         // case 44: //OK1+бедствие
-        // printf("OK1 %d +emegency\n", hashval);
+        // printf("OK1 %d +emergency\n", hashval);
         // j+=UVD_KOORD_KODE_LEN;
         // break;
         case 50: //OK3+бедствие
-        printf("OK3 %d +emegency\n", hashval);
+        printf("OK3 %d +emergency\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 76: //OK4+бедствие
-        printf("OK4 %d +emegency\n", hashval);
+        printf("OK4 %d +emergency\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
     }
