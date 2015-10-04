@@ -1418,7 +1418,7 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
     maxlevel = 0;
     for (i = 0; i < UVD_KOORD_KODE_LEN; i++) { 
         mediana+=m[j+i]; //SUMM(ALL)
-        if(minlevel>m[j+i]) {minlevel = m[j+i];} else
+        if(minlevel>m[j+i]) {minlevel = m[j+i];}
         if(maxlevel<m[j+i]) {maxlevel = m[j+i];}
     }
     
