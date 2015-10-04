@@ -1417,7 +1417,7 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
 
     //выдение импульсов и подсчет хэша кода
     //чистый случай, +шасси, +бедствие
-    //ОК2 (для ЗК2) = HASHVALUE+=i*1=22, +12=24 - +шасси, +10=32 - бедствие
+    //ОК2 (для ЗК2) = HASHVALUE+=i*1=22, +12=34 - +шасси, +10=32 - бедствие
     //ОК1 (для ЗК1) HASHVALUE+=i*1=28, +12=40 - +шасси, +16=44 - бедствие
     //ОК3 (для ЗК3) HASHVALUE+=i*1=36, +12=48 - +шасси, +24=50 - бедствие
     //ОК4 (-) HASHVALUE+=i*1=44, +12=56 - +шасси, +32=76 - бедствие
@@ -1427,6 +1427,57 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
         hashval+=i*(m[j+i]>mediana ? 1 : 0);
     }
     printf("%d ", hashval);
+
+    switch(hashval) {
+        case 22: //OK2
+        printf("OK2 %d ", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 28: //OK1
+        printf("OK1 %d ", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 36: //OK3
+        printf("OK3 %d ", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 44: //OK4
+        printf("OK4 %d ", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 34: //OK2+шасси
+        printf("OK2 %d +chassis", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 40: //OK1+шасси
+        printf("OK1 %d +chassis", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 48: //OK3+шасси
+        printf("OK3 %d +chassis", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 56: //OK4+шасси
+        printf("OK4 %d +chassis", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 32: //OK2+бедствие
+        printf("OK2 %d +emegency", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 44: //OK1+бедствие
+        printf("OK1 %d +emegency", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 50: //OK3+бедствие
+        printf("OK3 %d +emegency", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+        case 76: //OK4+бедствие
+        printf("OK4 %d +emegency", hashval);
+        j+=UVD_KOORD_KODE_LEN;
+        break;
+    }
 
 }
 
