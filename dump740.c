@@ -1404,11 +1404,11 @@ void detectModeS(uint16_t *m, uint32_t mlen) {
 //UVD_KOORD_KODE_LEN
 
 uint32_t mediana = 0;
-int i, j;
+uint i, j;
 
 for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
 
-    for (i = 0; i<UVD_KOORD_KODE_LEN; i++) { mediana+=m[j+i+1]; }
+    for (i = 0; i < UVD_KOORD_KODE_LEN; i++) { mediana+=m[j+i+1]; }
     mediana/= UVD_KOORD_KODE_LEN;
     printf("%d ", mediana);
 
