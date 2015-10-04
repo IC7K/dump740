@@ -1442,7 +1442,7 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 44: //OK4
-        printf("OK4 %d ", hashval);
+        printf("OK4 or OK1+emergency %d ", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 34: //OK2+шасси
@@ -1465,10 +1465,10 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
         printf("OK2 %d +emegency", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
-        case 44: //OK1+бедствие
-        printf("OK1 %d +emegency", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
+        // case 44: //OK1+бедствие
+        // printf("OK1 %d +emegency", hashval);
+        // j+=UVD_KOORD_KODE_LEN;
+        // break;
         case 50: //OK3+бедствие
         printf("OK3 %d +emegency", hashval);
         j+=UVD_KOORD_KODE_LEN;
