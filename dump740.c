@@ -1430,51 +1430,51 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
 
     switch(hashval) {
         case 22: //OK2
-        printf("OK2 %d ", hashval);
+        printf("OK2 %d\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 28: //OK1
-        printf("OK1 %d ", hashval);
+        printf("OK1 %d\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 36: //OK3
-        printf("OK3 %d ", hashval);
+        printf("OK3 %d\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 44: //OK4
-        printf("OK4 or OK1+emergency %d ", hashval);
+        printf("OK4 or OK1+emergency %d\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 34: //OK2+шасси
-        printf("OK2 %d +chassis", hashval);
+        printf("OK2 %d +chassis\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 40: //OK1+шасси
-        printf("OK1 %d +chassis", hashval);
+        printf("OK1 %d +chassis\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 48: //OK3+шасси
-        printf("OK3 %d +chassis", hashval);
+        printf("OK3 %d +chassis\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 56: //OK4+шасси
-        printf("OK4 %d +chassis", hashval);
+        printf("OK4 %d +chassis\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 32: //OK2+бедствие
-        printf("OK2 %d +emegency", hashval);
+        printf("OK2 %d +emegency\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         // case 44: //OK1+бедствие
-        // printf("OK1 %d +emegency", hashval);
+        // printf("OK1 %d +emegency\n\n", hashval);
         // j+=UVD_KOORD_KODE_LEN;
         // break;
         case 50: //OK3+бедствие
-        printf("OK3 %d +emegency", hashval);
+        printf("OK3 %d +emegency\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 76: //OK4+бедствие
-        printf("OK4 %d +emegency", hashval);
+        printf("OK4 %d +emegency\n\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
     }
