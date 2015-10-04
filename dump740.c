@@ -1426,7 +1426,7 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
         //логическое выражение ? выражение 1 : выражение 2
         hashval+=i*(m[j+i]>mediana ? 1 : 0);
     }
-    printf("%d ", hashval);
+    // printf("%d ", hashval);
 
     switch(hashval) {
         case 22: //OK2
