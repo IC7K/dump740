@@ -62,6 +62,9 @@
 #define UVD_MSG_RAZR 40      //40 разрядов в сообщении
 #define UVD_MSG_DECADE_RAZR 4    //4 разряда на декаду
 #define UVD_MSG_POS 4    //4 разряда на декаду
+
+#define UVD_KOORD_KODE_LEN 45    //45 периодов по 0,5 мкс - длина анализа координатного кода
+
 //выделение кода из сигнала происходит в процедуре detectModeS 
 
 #define MODES_FULL_LEN (MODES_PREAMBLE_US+MODES_LONG_MSG_BITS)
@@ -1308,11 +1311,11 @@ void applyPhaseCorrection(uint16_t *m) {
  * size 'mlen' bytes. Every detected Mode S message is convert it into a
  * stream of bits and passed to the function to display it. */
 void detectModeS(uint16_t *m, uint32_t mlen) {
-    unsigned char bits[MODES_LONG_MSG_BITS];
-    unsigned char msg[MODES_LONG_MSG_BITS/2];
-    uint16_t aux[MODES_LONG_MSG_BITS*2];
-    uint32_t j;
-    int use_correction = 0;
+    // unsigned char bits[MODES_LONG_MSG_BITS];
+    // unsigned char msg[MODES_LONG_MSG_BITS/2];
+    // uint16_t aux[MODES_LONG_MSG_BITS*2];
+    // uint32_t j;
+    // int use_correction = 0;
 
     /* The Mode S preamble is made of impulses of 0.5 microseconds at
      * the following time offsets:
@@ -1351,7 +1354,7 @@ void detectModeS(uint16_t *m, uint32_t mlen) {
     ЕСЛИ СЭМПЛИРОВАНИЕ СИГНАЛА 0,5мкс
     ТО ВРЕМЕННаЯ РАСКЛАДКА БУДЕТ ТАКОЙ ([0,1,..] – номер значения в массиве данных)
     
-    [0]   начало 1-го периода - т=0 мкс        ------------------ PK1 начало
+    [0]   начало 1-го периода т=0 мкс        ------------------ PK1 начало
     [1]   начало 2-го периода т=0,5 мкс
     [2]   начало 3-го периода т=1 мкс
     [3]   начало 4-го периода т=1,5 мкс     
@@ -1398,206 +1401,217 @@ void detectModeS(uint16_t *m, uint32_t mlen) {
     [44]  начало 45-го периода т=22 мкс        ------------------ PK3 начало - ОК4 (-)
     
 */
+//UVD_KOORD_KODE_LEN
 
-    for (j = 0; j < mlen - MODES_FULL_LEN*2; j++) {
-        int low, high, delta, i, errors;
-        int good_message = 0;
+int mediana = 0;
+for (j = 0; j < mlen-UVD_KOORD_KODE_LEN-1; j++) {
 
-        if (use_correction) goto good_preamble; /* We already checked it. */
+    for (i =1; i<46; i++) { mediana+=m[j+i]; }
+    mediana/= 45;
+    printf("%d ", mediana);
 
-        /* First check of relations between the first 10 samples
-         * representing a valid preamble. We don't even investigate further
-         * if this simple test is not passed. */
-        if (!(m[j] > m[j+1] && // 0   -----------------
-            m[j+1] < m[j+2] && // 1   -
-            m[j+2] > m[j+3] && // 2   ------------------
-            m[j+3] < m[j] &&   // 3   --
-            m[j+4] < m[j] &&   // 4   -
-            m[j+5] < m[j] &&   // 5   --
-            m[j+6] < m[j] &&   // 6   -
-            m[j+7] > m[j+8] && // 7   ------------------
-            m[j+8] < m[j+9] && // 8   --
-            m[j+9] > m[j+6]))  // 9   -------------------
-        {
-            if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
-                m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
-                dumpRawMessage("Unexpected ratio among first 10 samples",
-                    msg, m, j);
-            continue;
-        }
+}
+
+
+    // for (j = 0; j < mlen - MODES_FULL_LEN*2; j++) {
+    //     int low, high, delta, i, errors;
+    //     int good_message = 0;
+
+    //     if (use_correction) goto good_preamble; /* We already checked it. */
+
+    //     /* First check of relations between the first 10 samples
+    //      * representing a valid preamble. We don't even investigate further
+    //      * if this simple test is not passed. */
+    //     if (!(m[j] > m[j+1] && // 0   -----------------
+    //         m[j+1] < m[j+2] && // 1   -
+    //         m[j+2] > m[j+3] && // 2   ------------------
+    //         m[j+3] < m[j] &&   // 3   --
+    //         m[j+4] < m[j] &&   // 4   -
+    //         m[j+5] < m[j] &&   // 5   --
+    //         m[j+6] < m[j] &&   // 6   -
+    //         m[j+7] > m[j+8] && // 7   ------------------
+    //         m[j+8] < m[j+9] && // 8   --
+    //         m[j+9] > m[j+6]))  // 9   -------------------
+    //     {
+    //         if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
+    //             m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
+    //             dumpRawMessage("Unexpected ratio among first 10 samples",
+    //                 msg, m, j);
+    //         continue;
+    //     }
 
         /* The samples between the two spikes must be < than the average
          * of the high spikes level. We don't test bits too near to
          * the high levels as signals can be out of phase so part of the
          * energy can be in the near samples. */
-        high = (m[j]+m[j+2]+m[j+7]+m[j+9])/6;
-        if (m[j+4] >= high ||
-            m[j+5] >= high)
-        {
-            if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
-                m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
-                dumpRawMessage(
-                    "Too high level in samples between 3 and 6",
-                    msg, m, j);
-            continue;
-        }
+        // high = (m[j]+m[j+2]+m[j+7]+m[j+9])/6;
+        // if (m[j+4] >= high ||
+        //     m[j+5] >= high)
+        // {
+        //     if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
+        //         m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
+        //         dumpRawMessage(
+        //             "Too high level in samples between 3 and 6",
+        //             msg, m, j);
+        //     continue;
+        // }
 
         /* Similarly samples in the range 11-14 must be low, as it is the
          * space between the preamble and real data. Again we don't test
          * bits too near to high levels, see above. */
-        if (m[j+11] >= high ||
-            m[j+12] >= high ||
-            m[j+13] >= high ||
-            m[j+14] >= high)
-        {
-            if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
-                m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
-                dumpRawMessage(
-                    "Too high level in samples between 10 and 15",
-                    msg, m, j);
-            continue;
-        }
-        Modes.stat_valid_preamble++;
+        // if (m[j+11] >= high ||
+        //     m[j+12] >= high ||
+        //     m[j+13] >= high ||
+        //     m[j+14] >= high)
+        // {
+        //     if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
+        //         m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
+        //         dumpRawMessage(
+        //             "Too high level in samples between 10 and 15",
+        //             msg, m, j);
+        //     continue;
+        // }
+        // Modes.stat_valid_preamble++;
 
-good_preamble:
+// good_preamble:
         /* If the previous attempt with this message failed, retry using
          * magnitude correction. */
-        if (use_correction) {
-            memcpy(aux,m+j+MODES_PREAMBLE_US*2,sizeof(aux));
-            if (j && detectOutOfPhase(m+j)) {
-                applyPhaseCorrection(m+j);
-                Modes.stat_out_of_phase++;
-            }
-            /* TODO ... apply other kind of corrections. */
-        }
+        // if (use_correction) {
+        //     memcpy(aux,m+j+MODES_PREAMBLE_US*2,sizeof(aux));
+        //     if (j && detectOutOfPhase(m+j)) {
+        //         applyPhaseCorrection(m+j);
+        //         Modes.stat_out_of_phase++;
+        //     }
+        //     /* TODO ... apply other kind of corrections. */
+        // }
 
         /* Decode all the next 112 bits, regardless of the actual message
          * size. We'll check the actual message type later. */
-        errors = 0;
-        for (i = 0; i < MODES_LONG_MSG_BITS*2; i += 2) {
-            low = m[j+i+MODES_PREAMBLE_US*2];
-            high = m[j+i+MODES_PREAMBLE_US*2+1];
-            delta = low-high;
-            if (delta < 0) delta = -delta;
+        // errors = 0;
+        // for (i = 0; i < MODES_LONG_MSG_BITS*2; i += 2) {
+        //     low = m[j+i+MODES_PREAMBLE_US*2];
+        //     high = m[j+i+MODES_PREAMBLE_US*2+1];
+        //     delta = low-high;
+        //     if (delta < 0) delta = -delta;
 
-            if (i > 0 && delta < 256) {
-                bits[i/2] = bits[i/2-1];
-            } else if (low == high) {
-                /* Checking if two adiacent samples have the same magnitude
-                 * is an effective way to detect if it's just random noise
-                 * that was detected as a valid preamble. */
-                bits[i/2] = 2; /* error */
-                if (i < MODES_SHORT_MSG_BITS*2) errors++;
-            } else if (low > high) {
-                bits[i/2] = 1;
-            } else {
-                /* (low < high) for exclusion  */
-                bits[i/2] = 0;
-            }
-        }
+        //     if (i > 0 && delta < 256) {
+        //         bits[i/2] = bits[i/2-1];
+        //     } else if (low == high) {
+        //          Checking if two adiacent samples have the same magnitude
+        //          * is an effective way to detect if it's just random noise
+        //          * that was detected as a valid preamble. 
+        //         bits[i/2] = 2; /* error */
+        //         if (i < MODES_SHORT_MSG_BITS*2) errors++;
+        //     } else if (low > high) {
+        //         bits[i/2] = 1;
+        //     } else {
+        //         /* (low < high) for exclusion  */
+        //         bits[i/2] = 0;
+        //     }
+        // }
 
         /* Restore the original message if we used magnitude correction. */
-        if (use_correction)
-            memcpy(m+j+MODES_PREAMBLE_US*2,aux,sizeof(aux));
+    //     if (use_correction)
+    //         memcpy(m+j+MODES_PREAMBLE_US*2,aux,sizeof(aux));
 
-        /* Pack bits into bytes */
-        for (i = 0; i < MODES_LONG_MSG_BITS; i += 8) {
-            msg[i/8] =
-                bits[i]<<7 | 
-                bits[i+1]<<6 | 
-                bits[i+2]<<5 | 
-                bits[i+3]<<4 | 
-                bits[i+4]<<3 | 
-                bits[i+5]<<2 | 
-                bits[i+6]<<1 | 
-                bits[i+7];
-        }
+    //     /* Pack bits into bytes */
+    //     for (i = 0; i < MODES_LONG_MSG_BITS; i += 8) {
+    //         msg[i/8] =
+    //             bits[i]<<7 | 
+    //             bits[i+1]<<6 | 
+    //             bits[i+2]<<5 | 
+    //             bits[i+3]<<4 | 
+    //             bits[i+4]<<3 | 
+    //             bits[i+5]<<2 | 
+    //             bits[i+6]<<1 | 
+    //             bits[i+7];
+    //     }
 
-        int msgtype = msg[0]>>3;
-        int msglen = modesMessageLenByType(msgtype)/8;
+    //     int msgtype = msg[0]>>3;
+    //     int msglen = modesMessageLenByType(msgtype)/8;
 
-        /* Last check, high and low bits are different enough in magnitude
-         * to mark this as real message and not just noise? */
-        delta = 0;
-        for (i = 0; i < msglen*8*2; i += 2) {
-            delta += abs(m[j+i+MODES_PREAMBLE_US*2]-
-                         m[j+i+MODES_PREAMBLE_US*2+1]);
-        }
-        delta /= msglen*4;
+    //     /* Last check, high and low bits are different enough in magnitude
+    //      * to mark this as real message and not just noise? */
+    //     delta = 0;
+    //     for (i = 0; i < msglen*8*2; i += 2) {
+    //         delta += abs(m[j+i+MODES_PREAMBLE_US*2]-
+    //                      m[j+i+MODES_PREAMBLE_US*2+1]);
+    //     }
+    //     delta /= msglen*4;
 
-        /* Filter for an average delta of three is small enough to let almost
-         * every kind of message to pass, but high enough to filter some
-         * random noise. */
-        if (delta < 10*255) {
-            use_correction = 0;
-            continue;
-        }
+    //     /* Filter for an average delta of three is small enough to let almost
+    //      * every kind of message to pass, but high enough to filter some
+    //      * random noise. */
+    //     if (delta < 10*255) {
+    //         use_correction = 0;
+    //         continue;
+    //     }
 
-        /* If we reached this point, and error is zero, we are very likely
-         * with a Mode S message in our hands, but it may still be broken
-         * and CRC may not be correct. This is handled by the next layer. */
-        if (errors == 0 || (Modes.aggressive && errors < 3)) {
-            struct modesMessage mm;
+    //     /* If we reached this point, and error is zero, we are very likely
+    //      * with a Mode S message in our hands, but it may still be broken
+    //      * and CRC may not be correct. This is handled by the next layer. */
+    //     if (errors == 0 || (Modes.aggressive && errors < 3)) {
+    //         struct modesMessage mm;
 
-            /* Decode the received message and update statistics */
-            decodeModesMessage(&mm,msg);
+    //         /* Decode the received message and update statistics */
+    //         decodeModesMessage(&mm,msg);
 
-            /* Update statistics. */
-            if (mm.crcok || use_correction) {
-                if (errors == 0) Modes.stat_demodulated++;
-                if (mm.errorbit == -1) {
-                    if (mm.crcok)
-                        Modes.stat_goodcrc++;
-                    else
-                        Modes.stat_badcrc++;
-                } else {
-                    Modes.stat_badcrc++;
-                    Modes.stat_fixed++;
-                    if (mm.errorbit < MODES_LONG_MSG_BITS)
-                        Modes.stat_single_bit_fix++;
-                    else
-                        Modes.stat_two_bits_fix++;
-                }
-            }
+    //         /* Update statistics. */
+    //         if (mm.crcok || use_correction) {
+    //             if (errors == 0) Modes.stat_demodulated++;
+    //             if (mm.errorbit == -1) {
+    //                 if (mm.crcok)
+    //                     Modes.stat_goodcrc++;
+    //                 else
+    //                     Modes.stat_badcrc++;
+    //             } else {
+    //                 Modes.stat_badcrc++;
+    //                 Modes.stat_fixed++;
+    //                 if (mm.errorbit < MODES_LONG_MSG_BITS)
+    //                     Modes.stat_single_bit_fix++;
+    //                 else
+    //                     Modes.stat_two_bits_fix++;
+    //             }
+    //         }
 
-            /* Output debug mode info if needed. */
-            if (use_correction == 0) {
-                if (Modes.debug & MODES_DEBUG_DEMOD)
-                    dumpRawMessage("Demodulated with 0 errors", msg, m, j);
-                else if (Modes.debug & MODES_DEBUG_BADCRC &&
-                         mm.msgtype == 17 &&
-                         (!mm.crcok || mm.errorbit != -1))
-                    dumpRawMessage("Decoded with bad CRC", msg, m, j);
-                else if (Modes.debug & MODES_DEBUG_GOODCRC && mm.crcok &&
-                         mm.errorbit == -1)
-                    dumpRawMessage("Decoded with good CRC", msg, m, j);
-            }
+    //         /* Output debug mode info if needed. */
+    //         if (use_correction == 0) {
+    //             if (Modes.debug & MODES_DEBUG_DEMOD)
+    //                 dumpRawMessage("Demodulated with 0 errors", msg, m, j);
+    //             else if (Modes.debug & MODES_DEBUG_BADCRC &&
+    //                      mm.msgtype == 17 &&
+    //                      (!mm.crcok || mm.errorbit != -1))
+    //                 dumpRawMessage("Decoded with bad CRC", msg, m, j);
+    //             else if (Modes.debug & MODES_DEBUG_GOODCRC && mm.crcok &&
+    //                      mm.errorbit == -1)
+    //                 dumpRawMessage("Decoded with good CRC", msg, m, j);
+    //         }
 
-            /* Skip this message if we are sure it's fine. */
-            if (mm.crcok) {
-                j += (MODES_PREAMBLE_US+(msglen*8))*2;
-                good_message = 1;
-                if (use_correction)
-                    mm.phase_corrected = 1;
-            }
+    //         /* Skip this message if we are sure it's fine. */
+    //         if (mm.crcok) {
+    //             j += (MODES_PREAMBLE_US+(msglen*8))*2;
+    //             good_message = 1;
+    //             if (use_correction)
+    //                 mm.phase_corrected = 1;
+    //         }
 
-            /* Pass data to the next layer */
-            useModesMessage(&mm);
-        } else {
-            if (Modes.debug & MODES_DEBUG_DEMODERR && use_correction) {
-                printf("The following message has %d demod errors\n", errors);
-                dumpRawMessage("Demodulated with errors", msg, m, j);
-            }
-        }
+    //         /* Pass data to the next layer */
+    //         useModesMessage(&mm);
+    //     } else {
+    //         if (Modes.debug & MODES_DEBUG_DEMODERR && use_correction) {
+    //             printf("The following message has %d demod errors\n", errors);
+    //             dumpRawMessage("Demodulated with errors", msg, m, j);
+    //         }
+    //     }
 
-        /* Retry with phase correction if possible. */
-        if (!good_message && !use_correction) {
-            j--;
-            use_correction = 1;
-        } else {
-            use_correction = 0;
-        }
-    }
+    //     /* Retry with phase correction if possible. */
+    //     if (!good_message && !use_correction) {
+    //         j--;
+    //         use_correction = 1;
+    //     } else {
+    //         use_correction = 0;
+    //     }
+    // }
 }
 
 /* When a new message is available, because it was decoded from the
