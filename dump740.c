@@ -1403,15 +1403,25 @@ void detectModeS(uint16_t *m, uint32_t mlen) {
 */
 //UVD_KOORD_KODE_LEN
 
-uint32_t mediana = 0;
+uint32_t mediana, minlevel, maxlevel;
 uint i, j;
 uint32_t hashval;
 
 //сканирование буффера длиной mlen
 for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
 
+    printf("VAL=%d", m[j]);
+
     //определение среднего значения в ряде периодов для выделения посылки над помехами
-    for (i = 0; i < UVD_KOORD_KODE_LEN; i++) { mediana+=m[j+i]; }
+    mediana = 0;
+    minlevel = 255;
+    maxlevel = 0;
+    for (i = 0; i < UVD_KOORD_KODE_LEN; i++) { 
+        mediana+=m[j+i]; //SUMM(ALL)
+        if(minlevel>m[j+i]) {minlevel = m[j+i];} else
+        if(maxlevel<m[j+i]) {maxlevel = m[j+i];}
+    }
+    
     mediana/= UVD_KOORD_KODE_LEN;
     // printf("%d ", mediana);
 
@@ -1430,51 +1440,51 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
 
     switch(hashval) {
         case 22: //OK2
-        printf("OK2 %d\n\n", hashval);
+        printf("OK2 %d\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 28: //OK1
-        printf("OK1 %d\n\n", hashval);
+        printf("OK1 %d\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 36: //OK3
-        printf("OK3 %d\n\n", hashval);
+        printf("OK3 %d\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 44: //OK4
-        printf("OK4 or OK1+emergency %d\n\n", hashval);
+        printf("OK4 or OK1+emergency %d\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 34: //OK2+шасси
-        printf("OK2 %d +chassis\n\n", hashval);
+        printf("OK2 %d +chassis\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 40: //OK1+шасси
-        printf("OK1 %d +chassis\n\n", hashval);
+        printf("OK1 %d +chassis\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 48: //OK3+шасси
-        printf("OK3 %d +chassis\n\n", hashval);
+        printf("OK3 %d +chassis\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 56: //OK4+шасси
-        printf("OK4 %d +chassis\n\n", hashval);
+        printf("OK4 %d +chassis\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 32: //OK2+бедствие
-        printf("OK2 %d +emegency\n\n", hashval);
+        printf("OK2 %d +emegency\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         // case 44: //OK1+бедствие
-        // printf("OK1 %d +emegency\n\n", hashval);
+        // printf("OK1 %d +emegency\n", hashval);
         // j+=UVD_KOORD_KODE_LEN;
         // break;
         case 50: //OK3+бедствие
-        printf("OK3 %d +emegency\n\n", hashval);
+        printf("OK3 %d +emegency\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
         case 76: //OK4+бедствие
-        printf("OK4 %d +emegency\n\n", hashval);
+        printf("OK4 %d +emegency\n", hashval);
         j+=UVD_KOORD_KODE_LEN;
         break;
     }
