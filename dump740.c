@@ -1328,6 +1328,34 @@ void applyPhaseCorrection(uint16_t *m) {
     }
 }
 
+// uint decodeKEY(uint16_t *m, uint32_t mlen, uint32_t pkkoffs) {
+// uint32_t mediana, pulselevel, pkkmediana, pkkpulselevel, p1, p2, p3, p4, p5, p6, i, pkkend;
+
+// //определение среднего значения в ряде периодов для выделения посылки над помехами
+// pkkmediana = 0;
+// pkkoffs = UVD_OK2_OFFS; //50
+// pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=97
+// for (i = pkkoffs; i < pkkend; i++) { 
+//     pkkmediana+=m[j+i]; //SUMM(ALL)
+// }    
+// pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+// pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
+// p1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+// p2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+// p3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+// p4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+// p5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+// p6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+
+// if( //000
+//     p1<p2 &&    //01
+//     p3<p4 &&    //01
+//     p5<p6       //01
+//   )     
+// }
+
+
 /* Detect a UVD responses inside the magnitude buffer pointed by 'm' and of
  * size 'mlen' bytes. 
  * Every detected UVD message is convert it into a
@@ -1785,6 +1813,7 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         if(b5>b6) dec1=dec1 | 1;
         dec1 = dec1<<1; //1110     
         if(b7>b8) dec1=dec1 | 1;
+        dec1+=(int) '0';
         //END DECADE 1
 
         //START DECADE 2 - bits for positions
@@ -1817,6 +1846,7 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         if(b5>b6) dec2=dec2 | 1;
         dec2 = dec2<<1; //1110     
         if(b7>b8) dec2=dec2 | 1;
+        dec2+=(int) '0';
         //END DECADE 2
 
         //START DECADE 3 - bits for positions
@@ -1849,6 +1879,7 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         if(b5>b6) dec3=dec3 | 1;
         dec3 = dec3<<1; //1110     
         if(b7>b8) dec3=dec3 | 1;
+        dec3+=(int) '0';
         //END DECADE 3
 
         //START DECADE 4 - bits for positions
@@ -1881,6 +1912,7 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         if(b5>b6) dec4=dec4 | 1;
         dec4 = dec4<<1; //1110     
         if(b7>b8) dec4=dec4 | 1;
+        dec4+=(int) '0';
         //END DECADE 4
 
         //START DECADE 5 - bits for positions
@@ -1913,6 +1945,7 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         if(b5>b6) dec5=dec5 | 1;
         dec5 = dec5<<1; //1110     
         if(b7>b8) dec5=dec5 | 1;
+        dec5+=(int) '0';
         //END DECADE 5
 
         //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
