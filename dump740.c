@@ -1754,10 +1754,20 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
           ) 
         {
         //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
-        
+
         //START DECADE 1 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
+
+        //определение среднего значения в ряде периодов для выделения посылки над помехами
+        pkkmediana = 0;
+        pkkend = pkkoffs + UVD_DECADE_LEN;
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
         b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
         b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
         b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
@@ -1780,6 +1790,16 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         //START DECADE 2 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        //определение среднего значения в ряде периодов для выделения посылки над помехами
+        pkkmediana = 0;
+        pkkend = pkkoffs + UVD_DECADE_LEN;
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
         b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
         b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
         b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
@@ -1802,6 +1822,16 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         //START DECADE 3 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        //определение среднего значения в ряде периодов для выделения посылки над помехами
+        pkkmediana = 0;
+        pkkend = pkkoffs + UVD_DECADE_LEN;
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_DECADE_LEN;    
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
         b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
         b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
         b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
@@ -1824,6 +1854,16 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         //START DECADE 4 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        //определение среднего значения в ряде периодов для выделения посылки над помехами
+        pkkmediana = 0;
+        pkkend = pkkoffs + UVD_DECADE_LEN;
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
         b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
         b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
         b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
@@ -1846,6 +1886,16 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         //START DECADE 5 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        //определение среднего значения в ряде периодов для выделения посылки над помехами
+        pkkmediana = 0;
+        pkkend = pkkoffs + UVD_DECADE_LEN;
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
         b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
         b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
         b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
