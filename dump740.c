@@ -36,7 +36,9 @@
 #include <errno.h>
 #include <unistd.h>
 #include <math.h>
+#include <time.h>
 #include <sys/time.h>
+#include <sys/timeb.h> 
 #include <signal.h>
 #include <fcntl.h>
 #include <ctype.h>
@@ -64,8 +66,21 @@
 #define UVD_MSG_POS 4    //4 разряда на декаду
 
 #define UVD_KOORD_KODE_LEN 45    //45 периодов по 0,5 мкс - длина анализа координатного кода
+#define UVD_KEY_KODE_LEN 48      //48 периодов по 0,5 мкс - длина анализа ключевого кода 
+#define UVD_INFO_KODE_LEN 640    //64*5=320 *2=640(с повтором) периодов по 0,5 мкс - длина анализа информационной части 
+#define UVD_OK1_DELAY 17         //8.5mks бортовой номер
+#define UVD_OK2_DELAY 28          //14mks высота топливо
+#define UVD_OK3_DELAY 20          //10mks скорость
+#define UVD_OK1_OFFS 45          //8.5mks бортовой номер
+#define UVD_OK2_OFFS 50          //14mks высота топливо
+#define UVD_OK3_OFFS 57          //10mks скорость
+#define UVD_DECADE_LEN 64         //64 periods by 0.5mks
 
-//выделение кода из сигнала происходит в процедуре detectModeS 
+
+#define UVD_RESPONSE_LEN UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN //общая длинна ответа 
+
+
+//выделение кода из сигнала происходит в процедуре detectUVD 
 
 #define MODES_FULL_LEN (MODES_PREAMBLE_US+MODES_LONG_MSG_BITS)
 #define MODES_LONG_MSG_BYTES (112/8)
@@ -375,11 +390,17 @@ void modesInitRTLSDR(void) {
             int gains[100];
 
             numgains = rtlsdr_get_tuner_gains(Modes.dev, gains);
-            Modes.gain = gains[numgains-1];
-            fprintf(stderr, "Max available gain is: %.2f\n", Modes.gain/10.0);
+            
+            fprintf(stderr, "Available GAIN values: ");
+            for(j=0; j<numgains;j++) fprintf(stderr, "%.2f ", gains[j]/10.0);
+
+            // fprintf(stderr, "\nMax available gain is: %.2f\n", gains[numgains-1]/10.0);
+
+            //установим не самую большую чувствительность
+            Modes.gain = gains[numgains-6];
         }
         rtlsdr_set_tuner_gain(Modes.dev, Modes.gain);
-        fprintf(stderr, "Setting gain to: %.2f\n", Modes.gain/10.0);
+        fprintf(stderr, "\nSET TUNER GAIN to: %.2f (rtlsdr_set_tuner_gain)\n", Modes.gain/10.0);
     } else {
         fprintf(stderr, "Using automatic gain control.\n");
     }
@@ -388,7 +409,7 @@ void modesInitRTLSDR(void) {
     rtlsdr_set_center_freq(Modes.dev, Modes.freq);
     rtlsdr_set_sample_rate(Modes.dev, MODES_DEFAULT_RATE);
     rtlsdr_reset_buffer(Modes.dev);
-    fprintf(stderr, "Gain reported by device: %.2f\n",
+    fprintf(stderr, "Current GAIN: %.2f\n",
         rtlsdr_get_tuner_gain(Modes.dev)/10.0);
 }
 
@@ -931,7 +952,7 @@ char *getMEDescription(int metype, int mesub) {
 }
 
 /* Decode a raw Mode S message demodulated as a stream of bytes by
- * detectModeS(), and split it into fields populating a modesMessage
+ * detectUVD(), and split it into fields populating a modesMessage
  * structure. */
 void decodeModesMessage(struct modesMessage *mm, unsigned char *msg) {
     uint32_t crc2;   /* Computed CRC, used to verify the message CRC. */
@@ -1307,39 +1328,11 @@ void applyPhaseCorrection(uint16_t *m) {
     }
 }
 
-/* Detect a Mode S messages inside the magnitude buffer pointed by 'm' and of
- * size 'mlen' bytes. Every detected Mode S message is convert it into a
+/* Detect a UVD responses inside the magnitude buffer pointed by 'm' and of
+ * size 'mlen' bytes. 
+ * Every detected UVD message is convert it into a
  * stream of bits and passed to the function to display it. */
-void detectModeS(uint16_t *m, uint32_t mlen) {
-    // unsigned char bits[MODES_LONG_MSG_BITS];
-    // unsigned char msg[MODES_LONG_MSG_BITS/2];
-    // uint16_t aux[MODES_LONG_MSG_BITS*2];
-    // uint32_t j;
-    // int use_correction = 0;
-
-    /* The Mode S preamble is made of impulses of 0.5 microseconds at
-     * the following time offsets:
-     *
-     * 0   - 0.5 usec: first impulse.
-     * 1.0 - 1.5 usec: second impulse.
-     * 3.5 - 4   usec: third impulse.
-     * 4.5 - 5   usec: last impulse.
-     * 
-     * Since we are sampling at 2 Mhz every sample in our magnitude vector
-     * is 0.5 usec, so the preamble will look like this, assuming there is
-     * an impulse at offset 0 in the array:
-     *
-     * 0   -----------------
-     * 1   -
-     * 2   ------------------
-     * 3   --
-     * 4   -
-     * 5   --
-     * 6   -
-     * 7   ------------------
-     * 8   --
-     * 9   -------------------
-     */
+void detectUVD(uint16_t *m, uint32_t mlen) {
 
 /*    
     Всего стандартом предусмотрено шесть координатных кодов: ОК1-ОК6.
@@ -1376,13 +1369,13 @@ void detectModeS(uint16_t *m, uint32_t mlen) {
     [19]  начало 20-го периода т=9,5 мкс       
     [20]  начало 21-го периода т=10 мкс                   
     [21]  начало 22-го периода т=10,5 мкс      
-    [22]  начало 23-го периода т=11 мкс        ------------------ **** PK3 начало - ОК2 (для ЗК2) = HASHVALUE+=i*1=22
+    [22]  начало 23-го периода т=11 мкс        ------------------ **** PK3 начало - ОК2 (для ЗК2) 
     [23]  начало 24-го периода т=11,5 мкс      
     [24]  начало 25-го периода т=12 мкс        ------------------------ РК2 для ОК3 - ОК6 (бедствие)     
     [25]  начало 26-го периода т=12,5 мкс      
     [26]  начало 27-го периода т=13 мкс        
     [27]  начало 28-го периода т=13,5 мкс      
-    [28]  начало 29-го периода т=14 мкс        ------------------ **** PK3 начало - ОК1 (для ЗК1) HASHVALUE+=i*1=28
+    [28]  начало 29-го периода т=14 мкс        ------------------ **** PK3 начало - ОК1 (для ЗК1) 
     [29]  начало 30-го периода т=14,5 мкс  
     [30]  начало 31-го периода т=15 мкс 
     [31]  начало 32-го периода т=15,5 мкс
@@ -1390,7 +1383,7 @@ void detectModeS(uint16_t *m, uint32_t mlen) {
     [33]  начало 34-го периода т=16,5 мкс     
     [34]  начало 35-го периода т=17 мкс  
     [35]  начало 36-го периода т=17,5 мкс  
-    [36]  начало 37-го периода т=18 мкс        ------------------ **** PK3 начало - ОК3 (для ЗК3) HASHVALUE+=i*1=36 
+    [36]  начало 37-го периода т=18 мкс        ------------------ **** PK3 начало - ОК3 (для ЗК3) 
     [37]  начало 38-го периода т=18,5 мкс
     [38]  начало 39-го периода т=19 мкс     
     [39]  начало 40-го периода т=19,5 мкс  
@@ -1398,14 +1391,26 @@ void detectModeS(uint16_t *m, uint32_t mlen) {
     [41]  начало 42-го периода т=20,5 мкс
     [42]  начало 43-го периода т=21 мкс
     [43]  начало 44-го периода т=21,5 мкс     
-    [44]  начало 45-го периода т=22 мкс        ------------------ **** PK3 начало - ОК4 (-) HASHVALUE+=i*1=44
-    
+    [44]  начало 45-го периода т=22 мкс        ------------------ **** PK3 начало - ОК4 (-)
+
+   
+
+    Наиболее эффективный фильтр получается по принципу "n за t" - n-штук сообщений за контрольный интервал времени t.
+    Если выполнилось двойное условие - считаем (hex или К1) достоверным.
+    Нет - сбрасываем счетчик и начинаем цикл заново.
+    В УВД, из-за отсутствия CRC и других средств - n требуется больше, чем в ModeS.
+    Зато и по стандарту их до 150 шт. в секунду может излучаться против 20-30 шт. (каждого подтипа) в adsb.    
 */
 //UVD_KOORD_KODE_LEN
 
-uint32_t mediana, minlevel, maxlevel, pulselevel;
-uint i, j;
-uint32_t hashval;
+uint32_t mediana, pulselevel, pkkmediana, pkkpulselevel, p1, p2, p3, p4, p5, p6;
+uint32_t b1, b2, b3, b4, b5, b6, b7, b8;
+uint dec1, dec2, dec3, dec4, dec5;
+uint i, j, pkkoffs, pkkend;
+// char regnumber[6];
+// time_t t;
+// uint32_t hashval;
+// time_t now = time(NULL);
 
 //сканирование буффера длиной mlen
 for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
@@ -1414,287 +1419,614 @@ for (j = 0; j < mlen-UVD_KOORD_KODE_LEN; j++) {
 
     //определение среднего значения в ряде периодов для выделения посылки над помехами
     mediana = 0;
-    minlevel = 999;
-    maxlevel = 0;
     for (i = 0; i < UVD_KOORD_KODE_LEN; i++) { 
         mediana+=m[j+i]; //SUMM(ALL)
-        if(minlevel>m[j+i]) {minlevel = m[j+i];}
-        if(maxlevel<m[j+i]) {maxlevel = m[j+i];}
     }
     
-    mediana/= UVD_KOORD_KODE_LEN;
+    mediana = mediana / UVD_KOORD_KODE_LEN;
 
-    pulselevel = (maxlevel-minlevel)/4+mediana;
+    pulselevel = mediana / 2 + mediana;
 
-    // printf("%d ", mediana);
+    // printf("MED=%d ", mediana);
+    // printf("PULSE=%d ", pulselevel);
 
-    //выдение импульсов и подсчет хэша кода
-    //чистый случай, +шасси, +бедствие
-    //ОК2 (для ЗК2) = HASHVALUE+=i*1=22, +12=34 - +шасси, +10=32 - бедствие
-    //ОК1 (для ЗК1) HASHVALUE+=i*1=28, +12=40 - +шасси, +16=44 - бедствие
-    //ОК3 (для ЗК3) HASHVALUE+=i*1=36, +12=48 - +шасси, +24=50 - бедствие
-    //ОК4 (-) HASHVALUE+=i*1=44, +12=56 - +шасси, +32=76 - бедствие
-    hashval = 0;
-    for (i = 0; i < UVD_KOORD_KODE_LEN; i++) { 
-        //логическое выражение ? выражение 1 : выражение 2
-        hashval+=i*(m[j+i]>pulselevel ? 1 : 0);
-    }
-    // printf("%d ", hashval);
+    //если начало не идет с импульса (PK1) то сдвигаем окно на следующий период
+    if(m[j]<pulselevel) continue;
 
-    switch(hashval) {
-        case 22: //OK2
-        printf("OK2 %d\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 28: //OK1
-        printf("OK1 %d\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 36: //OK3
-        printf("OK3 %d\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 44: //OK4
-        printf("OK4 or OK1+emergency %d\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 34: //OK2+шасси
-        printf("OK2 %d +chassis\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 40: //OK1+шасси
-        printf("OK1 %d +chassis\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 48: //OK3+шасси
-        printf("OK3 %d +chassis\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 56: //OK4+шасси
-        printf("OK4 %d +chassis\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 32: //OK2+бедствие
-        printf("OK2 %d +emergency\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        // case 44: //OK1+бедствие
-        // printf("OK1 %d +emergency\n", hashval);
-        // j+=UVD_KOORD_KODE_LEN;
-        // break;
-        case 50: //OK3+бедствие
-        printf("OK3 %d +emergency\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-        case 76: //OK4+бедствие
-        printf("OK4 %d +emergency\n", hashval);
-        j+=UVD_KOORD_KODE_LEN;
-        break;
-    }
+    /*
+    Для передачи сообщения используется натуральный двоично-десятичный четырехразрядный код с активной паузой,
+    т. е. импульс передается как на символ 1, так и на 0, но сдвинутым на 4 мкс. 
+    Таким образом, каждому разряду отводится 8 мкс. 
+    */
 
-}
+    // time(&t);
+    
+
+    // struct timeb tmb;
+    // ftime(&tmb);
+    // printf("%ld.%d\n", tmb.time, tmb.millitm);
 
 
-    // for (j = 0; j < mlen - MODES_FULL_LEN*2; j++) {
-    //     int low, high, delta, i, errors;
-    //     int good_message = 0;
 
-    //     if (use_correction) goto good_preamble; /* We already checked it. */
+    char timestr[20];
+    struct timeval tp;
+    gettimeofday(&tp, 0);
+    time_t curtime = tp.tv_sec;
+    struct tm *t = localtime(&curtime);
+    sprintf(timestr, "%02d:%02d:%02d.%03d", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
 
-    //     /* First check of relations between the first 10 samples
-    //      * representing a valid preamble. We don't even investigate further
-    //      * if this simple test is not passed. */
-    //     if (!(m[j] > m[j+1] && // 0   -----------------
-    //         m[j+1] < m[j+2] && // 1   -
-    //         m[j+2] > m[j+3] && // 2   ------------------
-    //         m[j+3] < m[j] &&   // 3   --
-    //         m[j+4] < m[j] &&   // 4   -
-    //         m[j+5] < m[j] &&   // 5   --
-    //         m[j+6] < m[j] &&   // 6   -
-    //         m[j+7] > m[j+8] && // 7   ------------------
-    //         m[j+8] < m[j+9] && // 8   --
-    //         m[j+9] > m[j+6]))  // 9   -------------------
-    //     {
-    //         if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
-    //             m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
-    //             dumpRawMessage("Unexpected ratio among first 10 samples",
-    //                 msg, m, j);
-    //         continue;
-    //     }
+    // regnumber[0] = (char) (int) '0'; //+1);
+    // printf("regnumber=%c",regnumber[0]);
 
-        /* The samples between the two spikes must be < than the average
-         * of the high spikes level. We don't test bits too near to
-         * the high levels as signals can be out of phase so part of the
-         * energy can be in the near samples. */
-        // high = (m[j]+m[j+2]+m[j+7]+m[j+9])/6;
-        // if (m[j+4] >= high ||
-        //     m[j+5] >= high)
-        // {
-        //     if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
-        //         m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
-        //         dumpRawMessage(
-        //             "Too high level in samples between 3 and 6",
-        //             msg, m, j);
-        //     continue;
-        // }
+    //******************* OK2 **********************
 
-        /* Similarly samples in the range 11-14 must be low, as it is the
-         * space between the preamble and real data. Again we don't test
-         * bits too near to high levels, see above. */
-        // if (m[j+11] >= high ||
-        //     m[j+12] >= high ||
-        //     m[j+13] >= high ||
-        //     m[j+14] >= high)
-        // {
-        //     if (Modes.debug & MODES_DEBUG_NOPREAMBLE &&
-        //         m[j] > MODES_DEBUG_NOPREAMBLE_LEVEL)
-        //         dumpRawMessage(
-        //             "Too high level in samples between 10 and 15",
-        //             msg, m, j);
-        //     continue;
-        // }
-        // Modes.stat_valid_preamble++;
+    if((uint32_t) ((m[j+21]+m[j+22]+m[j+23])/3)>pulselevel) {
+    //OK2
+    //t=14mks 000
+    /*
+    [23]  т=0,5 мкс       
+    [24]  т=1 мкс       
+    [25]  т=1,5 мкс               
+    [26]  т=2 мкс       
+    [27]  т=2,5 мкс       
+    [28]  т=3 мкс   
+    [29]  т=3,5 мкс       
+    [30]  т=4 мкс       
+    [31]  т=4,5 мкс
+    [32]  т=5 мкс       
+    [33]  т=5.5 мкс       
+    [34]  т=6 мкс               
+    [35]  т=6.5 мкс       
+    [36]  т=7 мкс       
+    [37]  т=7.5 мкс   
+    [38]  т=8 мкс       
+    [39]  т=8.5 мкс       
+    [40]  т=9 мкс          
+    [41]  т=9.5 мкс               
+    [42]  т=10 мкс       
+    [43]  т=10.5 мкс       
+    [44]  т=11 мкс   
+    [45]  т=11.5 мкс       
+    [46]  т=12 мкс       
+    [47]  т=12.5 мкс     
+    [48]  т=13 мкс               
+    [49]  т=13.5 мкс   
 
-// good_preamble:
-        /* If the previous attempt with this message failed, retry using
-         * magnitude correction. */
-        // if (use_correction) {
-        //     memcpy(aux,m+j+MODES_PREAMBLE_US*2,sizeof(aux));
-        //     if (j && detectOutOfPhase(m+j)) {
-        //         applyPhaseCorrection(m+j);
-        //         Modes.stat_out_of_phase++;
-        //     }
-        //     /* TODO ... apply other kind of corrections. */
-        // }
+    ---РКИ1 =0
+    -----POS1 =0 SUMM(50-57)<SUMM(58-65)
+    [50]  т=14 мкс     t=0 mks
+    [51]  т=14.5 мкс   t=0.5 mks       
+    [52]  т=15 мкс     t=1 mks  
+    [53]  т=15,5 мкс   t=1.5 mks  
+    [54]  т=16 мкс     t=2 mks
+    [55]  т=16,5 мкс   t=2.5 mks
+    [56]  т=17 мкс     t=3 mks
+    [57]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [58]  т=18 мкс     t=4mks   t=0 mks
+    [59]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [60]  т=19 мкс     t=5mks   t=1 mks  
+    [61]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [62]  т=20 мкс     t=6mks   t=2 mks
+    [63]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [64]  т=21 мкс     t=7mks   t=3 mks
+    [65]  т=21,5 мкс   t=7.5mks t=3.5 mks
 
-        /* Decode all the next 112 bits, regardless of the actual message
-         * size. We'll check the actual message type later. */
-        // errors = 0;
-        // for (i = 0; i < MODES_LONG_MSG_BITS*2; i += 2) {
-        //     low = m[j+i+MODES_PREAMBLE_US*2];
-        //     high = m[j+i+MODES_PREAMBLE_US*2+1];
-        //     delta = low-high;
-        //     if (delta < 0) delta = -delta;
+    ---РКИ2 =0   
+    -----POS1 =0 SUMM(66-73)<SUMM(74-81)
+    [66]  т=14 мкс     t=0 mks
+    [67]  т=14.5 мкс   t=0.5 mks       
+    [68]  т=15 мкс     t=1 mks  
+    [69]  т=15,5 мкс   t=1.5 mks  
+    [70]  т=16 мкс     t=2 mks
+    [71]  т=16,5 мкс   t=2.5 mks
+    [72]  т=17 мкс     t=3 mks
+    [73]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [74]  т=18 мкс     t=4mks   t=0 mks
+    [75]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [76]  т=19 мкс     t=5mks   t=1 mks  
+    [77]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [78]  т=20 мкс     t=6mks   t=2 mks
+    [79]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [80]  т=21 мкс     t=7mks   t=3 mks
+    [81]  т=21,5 мкс   t=7.5mks t=3.5 mks
 
-        //     if (i > 0 && delta < 256) {
-        //         bits[i/2] = bits[i/2-1];
-        //     } else if (low == high) {
-        //          Checking if two adiacent samples have the same magnitude
-        //          * is an effective way to detect if it's just random noise
-        //          * that was detected as a valid preamble. 
-        //         bits[i/2] = 2; /* error */
-        //         if (i < MODES_SHORT_MSG_BITS*2) errors++;
-        //     } else if (low > high) {
-        //         bits[i/2] = 1;
-        //     } else {
-        //         /* (low < high) for exclusion  */
-        //         bits[i/2] = 0;
-        //     }
-        // }
+    ---РКИ3 =0   
+    -----POS1 =0 SUMM(82-89)<SUMM(90-97)
+    [82]  т=14 мкс     t=0 mks
+    [83]  т=14.5 мкс   t=0.5 mks       
+    [84]  т=15 мкс     t=1 mks  
+    [85]  т=15,5 мкс   t=1.5 mks  
+    [86]  т=16 мкс     t=2 mks
+    [87]  т=16,5 мкс   t=2.5 mks
+    [88]  т=17 мкс     t=3 mks
+    [89]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [90]  т=18 мкс     t=4mks   t=0 mks
+    [91]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [92]  т=19 мкс     t=5mks   t=1 mks  
+    [93]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [94]  т=20 мкс     t=6mks   t=2 mks
+    [95]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [96]  т=21 мкс     t=7mks   t=3 mks
+    [97]  т=21,5 мкс   t=7.5mks t=3.5 mks    
 
-        /* Restore the original message if we used magnitude correction. */
-    //     if (use_correction)
-    //         memcpy(m+j+MODES_PREAMBLE_US*2,aux,sizeof(aux));
+    ---РКИ1 =0
+    -----POS1 =0 SUMM(50-57)<SUMM(58-65)  
+    ---РКИ2 =0   
+    -----POS1 =0 SUMM(66-73)<SUMM(74-81)
+    ---РКИ3 =0   
+    -----POS1 =0 SUMM(82-89)<SUMM(90-97)                
+    */      
+/*
 
-    //     /* Pack bits into bytes */
-    //     for (i = 0; i < MODES_LONG_MSG_BITS; i += 8) {
-    //         msg[i/8] =
-    //             bits[i]<<7 | 
-    //             bits[i+1]<<6 | 
-    //             bits[i+2]<<5 | 
-    //             bits[i+3]<<4 | 
-    //             bits[i+4]<<3 | 
-    //             bits[i+5]<<2 | 
-    //             bits[i+6]<<1 | 
-    //             bits[i+7];
-    //     }
+OK2 OK! 000 RKK 2607<2669 - 2543<2967 - 1589<2098 -- 360>297
+OK2 OK! 000 RKK 2458<3029 - 1589<1949 - 1589<2309 -- 360>324
+OK2 OK! 000 RKK 1949<2880 - 1589<2160 - 3710<3743 -- 360>311
+OK2 OK! 000 RKK 1589<2754 - 1949<2034 - 1949<2309 -- 805>386
+OK2 OK! 000 RKK 1440<2756 - 1949<2458 - 1738<2818 -- 805>297
+OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
 
-    //     int msgtype = msg[0]>>3;
-    //     int msglen = modesMessageLenByType(msgtype)/8;
+23:47:13:287 - OK2 OK! 000 RKK 720<3327 - 720<3178 - 1589<3178 -- 360>396 -- MED                                                                                                             =264
+23:57:01:042 - OK2 OK! 000 RKK 720<2669 - 360<2754 - 869<2967 -- 360>322 -- MED=                                                                                                             215
+00:05:40:506 - OK2 OK! 000 RKK 1229<2754 - 360<2818 - 720<2818 -- 360>333 -- MED                                                                                                             =222
+00:06:32:597 - OK2 OK! 000 RKK 1018<3029 - 1080<2839 - 360<2818 -- 509>348 -- ME                                                                                                             D=232
+00:07:26:478 - OK2 OK! 000 RKK 720<2458 - 869<2520 - 720<2458 -- 360>304 -- MED=                                                                                                             203
+00:22:22:707 - OK2 OK! 000 RKK 360<2458 - 360<2458 - 1440<2756 -- 509>306 -- MED                                                                                                             =204
+00:30:12:217 - OK2 OK! 000 RKK 360<2458 - 720<2458 - 720<2309 -- 509>282 -- MED=                                                                                                             188
+00:39:04:983 - OK2 OK! 000 RKK 720<2669 - 360<2607 - 720<2669 -- 509>304 -- MED=                                                                                                             203
+00:43:05:874 - OK2 OK! 000 RKK 869<3116 - 720<2967 - 1080<3029 -- 360>367 -- MED                                                                                                             =245
+00:57:44:362 - OK2 OK! 000 RKK 0<2098 - 720<2098 - 720<2669 -- 360>259 -- MED=17                                                                                                             3
+00:58:25:952 - OK2 OK! 000 RKK 360<2396 - 360<2309 - 1080<2309 -- 360>274 -- MED                                                                                                             =183
+01:03:36:985 - OK2 OK! 000 RKK 360<2458 - 869<2458 - 1080<2520 -- 509>304 -- MED                                                                                                             =203
+01:07:03:207 - OK2 OK! 000 RKK 360<2669 - 0<2309 - 360<2669 -- 509>261 -- MED=17                                                                                                             4
+01:16:19:892 - OK2 OK! 000 RKK 1949<2669 - 0<2967 - 360<2669 -- 360>331 -- MED=2                                                                                                             21
+01:22:16:934 - OK2 OK! 000 RKK 720<2309 - 360<2309 - 869<2458 -- 509>282 -- MED=                                                                                                             188
+01:26:39:600 - OK2 OK! 000 RKK 509<2458 - 720<2309 - 720<2309 -- 360>282 -- MED=                                                                                                             188
+01:29:41:156 - OK2 OK! 000 RKK 0<2818 - 1080<2756 - 1080<3265 -- 509>343 -- MED=                                                                                                             229
+01:39:53:281 - OK2 OK! 000 RKK 360<2669 - 720<2669 - 1440<2669 -- 360>328 -- MED                                                                                                             =219
 
-    //     /* Last check, high and low bits are different enough in magnitude
-    //      * to mark this as real message and not just noise? */
-    //     delta = 0;
-    //     for (i = 0; i < msglen*8*2; i += 2) {
-    //         delta += abs(m[j+i+MODES_PREAMBLE_US*2]-
-    //                      m[j+i+MODES_PREAMBLE_US*2+1]);
-    //     }
-    //     delta /= msglen*4;
+*/ 
 
-    //     /* Filter for an average delta of three is small enough to let almost
-    //      * every kind of message to pass, but high enough to filter some
-    //      * random noise. */
-    //     if (delta < 10*255) {
-    //         use_correction = 0;
-    //         continue;
-    //     }
+        //определение среднего значения в ряде периодов для выделения посылки над помехами
+        pkkmediana = 0;
+        pkkoffs = UVD_OK2_OFFS; //50
+        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=97
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-    //     /* If we reached this point, and error is zero, we are very likely
-    //      * with a Mode S message in our hands, but it may still be broken
-    //      * and CRC may not be correct. This is handled by the next layer. */
-    //     if (errors == 0 || (Modes.aggressive && errors < 3)) {
-    //         struct modesMessage mm;
+        p1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+        p2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+        p3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+        p4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+        p5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+        p6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
 
-    //         /* Decode the received message and update statistics */
-    //         decodeModesMessage(&mm,msg);
+        if( //000
+            p1<p2 &&    //01
+            p3<p4 &&    //01
+            p5<p6       //01
+          ) 
+        {
 
-    //         /* Update statistics. */
-    //         if (mm.crcok || use_correction) {
-    //             if (errors == 0) Modes.stat_demodulated++;
-    //             if (mm.errorbit == -1) {
-    //                 if (mm.crcok)
-    //                     Modes.stat_goodcrc++;
-    //                 else
-    //                     Modes.stat_badcrc++;
-    //             } else {
-    //                 Modes.stat_badcrc++;
-    //                 Modes.stat_fixed++;
-    //                 if (mm.errorbit < MODES_LONG_MSG_BITS)
-    //                     Modes.stat_single_bit_fix++;
-    //                 else
-    //                     Modes.stat_two_bits_fix++;
-    //             }
-    //         }
+        //Print result
+            printf("%s - OK2 OK RKK=000 [%d<%d - %d<%d - %d<%d] %d>%d MED=%d\n",
+                timestr,
+                m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
+                m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
+                m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
+                m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
+                m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
+                m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
+                m[j],
+                pulselevel,
+                mediana
+                );
+            j+=UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
+            continue;
+        } 
+            // else printf("%s - OK2 BAD RKK\n", timestr);
+    } //end OK2
+      
 
-    //         /* Output debug mode info if needed. */
-    //         if (use_correction == 0) {
-    //             if (Modes.debug & MODES_DEBUG_DEMOD)
-    //                 dumpRawMessage("Demodulated with 0 errors", msg, m, j);
-    //             else if (Modes.debug & MODES_DEBUG_BADCRC &&
-    //                      mm.msgtype == 17 &&
-    //                      (!mm.crcok || mm.errorbit != -1))
-    //                 dumpRawMessage("Decoded with bad CRC", msg, m, j);
-    //             else if (Modes.debug & MODES_DEBUG_GOODCRC && mm.crcok &&
-    //                      mm.errorbit == -1)
-    //                 dumpRawMessage("Decoded with good CRC", msg, m, j);
-    //         }
+    // continue;
 
-    //         /* Skip this message if we are sure it's fine. */
-    //         if (mm.crcok) {
-    //             j += (MODES_PREAMBLE_US+(msglen*8))*2;
-    //             good_message = 1;
-    //             if (use_correction)
-    //                 mm.phase_corrected = 1;
-    //         }
 
-    //         /* Pass data to the next layer */
-    //         useModesMessage(&mm);
-    //     } else {
-    //         if (Modes.debug & MODES_DEBUG_DEMODERR && use_correction) {
-    //             printf("The following message has %d demod errors\n", errors);
-    //             dumpRawMessage("Demodulated with errors", msg, m, j);
-    //         }
-    //     }
 
-    //     /* Retry with phase correction if possible. */
-    //     if (!good_message && !use_correction) {
-    //         j--;
-    //         use_correction = 1;
-    //     } else {
-    //         use_correction = 0;
-    //     }
-    // }
-}
+
+    //******************* OK1 **********************
+
+    if((uint32_t) ((m[j+27]+m[j+28]+m[j+29])/3)>pulselevel) {        
+    //OK1
+    //t=8.5mks 110
+    /*
+    [29]  т=0,5 мкс       
+    [30]  т=1 мкс       
+    [31]  т=1,5 мкс               
+    [32]  т=2 мкс       
+    [33]  т=2,5 мкс       
+    [34]  т=3 мкс   
+    [35]  т=3,5 мкс       
+    [36]  т=4 мкс       
+    [37]  т=4,5 мкс
+    [38]  т=5 мкс       
+    [39]  т=5.5 мкс       
+    [40]  т=6 мкс               
+    [41]  т=6.5 мкс       
+    [42]  т=7 мкс       
+    [43]  т=7.5 мкс   
+    [44]  т=8 мкс       
+
+    ---РКИ1 =1
+    -----POS1 =1 SUMM(45-52)>SUMM(53-60)
+    [45]  т=14 мкс     t=0 mks
+    [46]  т=14.5 мкс   t=0.5 mks       
+    [47]  т=15 мкс     t=1 mks  
+    [48]  т=15,5 мкс   t=1.5 mks  
+    [49]  т=16 мкс     t=2 mks
+    [50]  т=16,5 мкс   t=2.5 mks
+    [51]  т=17 мкс     t=3 mks
+    [52]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =0   
+    [53]  т=18 мкс     t=4mks   t=0 mks
+    [54]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [55]  т=19 мкс     t=5mks   t=1 mks  
+    [56]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [57]  т=20 мкс     t=6mks   t=2 mks
+    [58]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [59]  т=21 мкс     t=7mks   t=3 mks
+    [60]  т=21,5 мкс   t=7.5mks t=3.5 mks
+
+    ---РКИ2 =1   
+    -----POS1 =1 SUMM(61-68)>SUMM(69-76)
+    [61]  т=14 мкс     t=0 mks
+    [62]  т=14.5 мкс   t=0.5 mks       
+    [63]  т=15 мкс     t=1 mks  
+    [64]  т=15,5 мкс   t=1.5 mks  
+    [65]  т=16 мкс     t=2 mks
+    [66]  т=16,5 мкс   t=2.5 mks
+    [67]  т=17 мкс     t=3 mks
+    [68]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =0   
+    [69]  т=18 мкс     t=4mks   t=0 mks
+    [70]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [71]  т=19 мкс     t=5mks   t=1 mks  
+    [72]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [73]  т=20 мкс     t=6mks   t=2 mks
+    [74]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [75]  т=21 мкс     t=7mks   t=3 mks
+    [76]  т=21,5 мкс   t=7.5mks t=3.5 mks
+
+    ---РКИ3 =0   
+    -----POS1 =0 SUMM(77-84)<SUMM(85-92)
+    [77]  т=14 мкс     t=0 mks
+    [78]  т=14.5 мкс   t=0.5 mks       
+    [79]  т=15 мкс     t=1 mks  
+    [80]  т=15,5 мкс   t=1.5 mks  
+    [81]  т=16 мкс     t=2 mks
+    [82]  т=16,5 мкс   t=2.5 mks
+    [83]  т=17 мкс     t=3 mks
+    [84]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [85]  т=18 мкс     t=4mks   t=0 mks
+    [86]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [87]  т=19 мкс     t=5mks   t=1 mks  
+    [88]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [89]  т=20 мкс     t=6mks   t=2 mks
+    [90]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [91]  т=21 мкс     t=7mks   t=3 mks
+    [92]  т=21,5 мкс   t=7.5mks t=3.5 mks    
+
+    ---РКИ1 =1
+    -----POS1 =1 SUMM(45-52)>SUMM(53-60)
+    ---РКИ2 =1   
+    -----POS1 =1 SUMM(61-68)>SUMM(69-76)
+    ---РКИ3 =0   
+    -----POS1 =0 SUMM(77-84)<SUMM(85-92)
+
+    */     
+        //определение среднего значения в ряде периодов для выделения посылки над помехами
+        pkkmediana = 0;
+        pkkoffs = UVD_OK1_OFFS; //45
+        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=93
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
+
+        p1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+        p2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+        p3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+        p4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+        p5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+        p6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+
+        if( //110
+            p1>p2 &&    //10
+            p3>p4 &&    //10
+            p5<p6       //01
+          ) 
+        {
+        //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
+        
+        //START DECADE 1 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
+        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
+        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
+        //DECADE 1 - VALUE
+        dec1=0;
+        if(b1>b2) dec1=dec1 | 1;
+        dec1 = dec1<<1; //10
+        if(b3>b4) dec1=dec1 | 1;
+        dec1 = dec1<<1; //110       
+        if(b5>b6) dec1=dec1 | 1;
+        dec1 = dec1<<1; //1110     
+        if(b7>b8) dec1=dec1 | 1;
+        //END DECADE 1
+
+        //START DECADE 2 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
+        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
+        //DECADE 2 - VALUE
+        dec2=0;
+        if(b1>b2) dec2=dec2 | 1;
+        dec2 = dec2<<1; //10
+        if(b3>b4) dec2=dec2 | 1;
+        dec2 = dec2<<1; //110       
+        if(b5>b6) dec2=dec2 | 1;
+        dec2 = dec2<<1; //1110     
+        if(b7>b8) dec2=dec2 | 1;
+        //END DECADE 2
+
+        //START DECADE 3 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
+        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
+        //DECADE 3 - VALUE
+        dec3=0;
+        if(b1>b2) dec3=dec3 | 1;
+        dec3 = dec3<<1; //10
+        if(b3>b4) dec3=dec3 | 1;
+        dec3 = dec3<<1; //110       
+        if(b5>b6) dec3=dec3 | 1;
+        dec3 = dec3<<1; //1110     
+        if(b7>b8) dec3=dec3 | 1;
+        //END DECADE 3
+
+        //START DECADE 4 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
+        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
+        //DECADE 4 - VALUE
+        dec4=0;
+        if(b1>b2) dec4=dec4 | 1;
+        dec4 = dec4<<1; //10
+        if(b3>b4) dec4=dec4 | 1;
+        dec4 = dec4<<1; //110       
+        if(b5>b6) dec4=dec4 | 1;
+        dec4 = dec4<<1; //1110     
+        if(b7>b8) dec4=dec4 | 1;
+        //END DECADE 4
+
+        //START DECADE 5 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
+        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
+        //DECADE 5 - VALUE
+        dec5=0;
+        if(b1>b2) dec5=dec5 | 1;
+        dec5 = dec5<<1; //10
+        if(b3>b4) dec5=dec5 | 1;
+        dec5 = dec5<<1; //110       
+        if(b5>b6) dec5=dec5 | 1;
+        dec5 = dec5<<1; //1110     
+        if(b7>b8) dec5=dec5 | 1;
+        //END DECADE 5
+
+        //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
+
+            // printf("%s - OK1 OK RKK=110 [%d>%d - %d>%d - %d<%d] %d>%d MED=%d\n",
+            //     timestr,
+            //     m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
+            //     m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
+            //     m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
+            //     m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
+            //     m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
+            //     m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
+            //     m[j],
+            //     pulselevel,
+            //     mediana
+            //     );
+            printf("%s - OK1 OK RKK=110 REGN=%c%c%c%c%c\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1);
+
+            j+=UVD_KOORD_KODE_LEN+UVD_OK1_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
+            continue;
+        } 
+            // else printf("OK1 BAD RKK\n");
+    } //end OK1
+
+
+    //******************* OK3 **********************
+
+    if((uint32_t) ((m[j+36]+m[j+37]+m[j+38])/3)>pulselevel) {         
+    //OK3
+    //t=10mks 101
+    /*
+    [38]  т=0,5 мкс       
+    [39]  т=1 мкс       
+    [40]  т=1,5 мкс               
+    [41]  т=2 мкс       
+    [42]  т=2,5 мкс       
+    [43]  т=3 мкс   
+    [44]  т=3,5 мкс       
+    [45]  т=4 мкс       
+    [46]  т=4,5 мкс
+    [47]  т=5 мкс       
+    [48]  т=5.5 мкс       
+    [49]  т=6 мкс               
+    [50]  т=6.5 мкс       
+    [51]  т=7 мкс       
+    [52]  т=7.5 мкс   
+    [53]  т=8 мкс       
+    [54]  т=8.5 мкс       
+    [55]  т=9 мкс          
+    [56]  т=9.5 мкс               
+
+
+    ---РКИ1 =1
+    -----POS1 =1 SUMM(57-64)>SUMM(65-72)
+    [57]  т=14 мкс     t=0 mks
+    [58]  т=14.5 мкс   t=0.5 mks       
+    [59]  т=15 мкс     t=1 mks  
+    [60]  т=15,5 мкс   t=1.5 mks  
+    [61]  т=16 мкс     t=2 mks
+    [62]  т=16,5 мкс   t=2.5 mks
+    [63]  т=17 мкс     t=3 mks
+    [64]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =0   
+    [65]  т=18 мкс     t=4mks   t=0 mks
+    [66]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [67]  т=19 мкс     t=5mks   t=1 mks  
+    [68]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [69]  т=20 мкс     t=6mks   t=2 mks
+    [70]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [71]  т=21 мкс     t=7mks   t=3 mks
+    [72]  т=21,5 мкс   t=7.5mks t=3.5 mks
+
+    ---РКИ2 =0   
+    -----POS1 =0 SUMM(73-80)<SUMM(81-88)
+    [73]  т=14 мкс     t=0 mks
+    [74]  т=14.5 мкс   t=0.5 mks       
+    [75]  т=15 мкс     t=1 mks  
+    [76]  т=15,5 мкс   t=1.5 mks  
+    [77]  т=16 мкс     t=2 mks
+    [78]  т=16,5 мкс   t=2.5 mks
+    [79]  т=17 мкс     t=3 mks
+    [80]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [81]  т=18 мкс     t=4mks   t=0 mks
+    [82]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [83]  т=19 мкс     t=5mks   t=1 mks  
+    [84]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [85]  т=20 мкс     t=6mks   t=2 mks
+    [86]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [87]  т=21 мкс     t=7mks   t=3 mks
+    [88]  т=21,5 мкс   t=7.5mks t=3.5 mks
+
+    ---РКИ3 =1   
+    -----POS1 =1 SUMM(89-96)>SUMM(97-104)
+    [89]  т=14 мкс     t=0 mks
+    [90]  т=14.5 мкс   t=0.5 mks       
+    [91]  т=15 мкс     t=1 mks  
+    [92]  т=15,5 мкс   t=1.5 mks  
+    [93]  т=16 мкс     t=2 mks
+    [94]  т=16,5 мкс   t=2.5 mks
+    [95]  т=17 мкс     t=3 mks
+    [96]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =0
+    [97]  т=18 мкс     t=4mks   t=0 mks
+    [98]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [99]  т=19 мкс     t=5mks   t=1 mks  
+    100]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    101]  т=20 мкс     t=6mks   t=2 mks
+    102]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    103]  т=21 мкс     t=7mks   t=3 mks
+    104]  т=21,5 мкс   t=7.5mks t=3.5 mks    
+
+    ---РКИ1 =1
+    -----POS1 =1 SUMM(57-64)>SUMM(65-72)
+    ---РКИ2 =0   
+    -----POS1 =0 SUMM(73-80)<SUMM(81-88)
+    ---РКИ3 =1   
+    -----POS1 =1 SUMM(89-96)>SUMM(97-104)                      
+    */
+                    //определение среднего значения в ряде периодов для выделения посылки над помехами
+        pkkmediana = 0;
+        pkkoffs = UVD_OK3_OFFS; //57
+        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=104
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
+        p1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+        p2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+        p3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+        p4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+        p5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+        p6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+
+        if( //101
+            p1>p2 &&    //10
+            p3<p4 &&    //01
+            p5>p6       //10
+          ) 
+        {
+            printf("%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d MED=%d\n",
+                timestr,
+                m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
+                m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
+                m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
+                m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
+                m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
+                m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
+                m[j],
+                pulselevel,
+                mediana
+                );
+            j+=UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
+            continue;
+        }
+            // else printf("OK3 BAD RKK\n");          
+
+    } //end OK3 
+
+} //end for j
+
+} //end proc
 
 /* When a new message is available, because it was decoded from the
  * RTL device, file, or received in the TCP input port, or any other
@@ -2771,7 +3103,7 @@ int main(int argc, char **argv) {
          * stuff * at the same time. (This should only be useful with very
          * slow processors). */
         pthread_mutex_unlock(&Modes.data_mutex);
-        detectModeS(Modes.magnitude, Modes.data_len/2);
+        detectUVD(Modes.magnitude, Modes.data_len/2);
         backgroundTasks();
         pthread_mutex_lock(&Modes.data_mutex);
         if (Modes.exit) break;
