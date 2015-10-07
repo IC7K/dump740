@@ -1378,18 +1378,18 @@ return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4
 
 
 // 6 - OK1, 0 - OK2, 5 - OK3
-uint decodeKEY(uint16_t *m, uint32_t pkkoffs) {
-uint32_t pkkmediana, pkkpulselevel, i, pkkend;
+uint decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+// uint32_t pkkmediana, pkkpulselevel, i, pkkend;    
 uint result, p1, p2, p3, p4, p5, p6;
 
 //определение среднего значения в ряде периодов для выделения посылки над помехами
-pkkmediana = 0;
-pkkend = pkkoffs + UVD_KEY_KODE_LEN;
-for (i = pkkoffs; i < pkkend; i++) { 
-    pkkmediana+=m[i]; //SUMM(ALL)
-}    
-pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
-pkkpulselevel = pkkmediana / 2 + pkkmediana;
+// pkkmediana = 0;
+// pkkend = pkkoffs + UVD_KEY_KODE_LEN;
+// for (i = pkkoffs; i < pkkend; i++) { 
+//     pkkmediana+=m[i]; //SUMM(ALL)
+// }    
+// pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+// pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
 p1 = decodePOS(m, pkkoffs,    pkkpulselevel);
 p2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
@@ -1406,18 +1406,18 @@ return result;
 } //end decodeKEY
 
 
-uint decodeDECADE(uint16_t *m, uint32_t pkkoffs) {
-uint32_t pkkmediana, pkkpulselevel, i, pkkend;
+uint decodeDECADE(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+// uint32_t pkkmediana, pkkpulselevel, i, pkkend;
 uint result, b1, b2, b3, b4, b5, b6, b7, b8;
 
 //определение среднего значения в ряде периодов для выделения посылки над помехами
-pkkmediana = 0;
-pkkend = pkkoffs + UVD_DECADE_LEN;
-for (i = pkkoffs; i < pkkend; i++) { 
-    pkkmediana+=m[i]; //SUMM(ALL)
-}    
-pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-pkkpulselevel = pkkmediana / 2 + pkkmediana;
+// pkkmediana = 0;
+// pkkend = pkkoffs + UVD_DECADE_LEN;
+// for (i = pkkoffs; i < pkkend; i++) { 
+//     pkkmediana+=m[i]; //SUMM(ALL)
+// }    
+// pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+// pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
 b1 = decodePOS(m, pkkoffs,    pkkpulselevel);
 b2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
@@ -1429,7 +1429,7 @@ b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
 b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 
 result = 0;
-result = (b1 < b2) ? 0 : 8 | (b3 < b4) ? 0 : 4 | (b5 < b6) ? 0 : 2 | (b7 < b8) ? 0 : 1;
+result = ((b1 < b2) ? 0 : 8) | ((b3 < b4) ? 0 : 4) | ((b5 < b6) ? 0 : 2) | ((b7 < b8) ? 0 : 1);
 
 return result; 
 } //end decodeDECADE
@@ -1515,8 +1515,9 @@ void detectUVD(uint16_t *m, uint32_t mlen) {
 */
 //UVD_KOORD_KODE_LEN
 
-uint32_t mediana, pulselevel, pkkmediana, pkkpulselevel, p1, p2, p3, p4, p5, p6;
-uint32_t b1, b2, b3, b4, b5, b6, b7, b8;
+uint32_t mediana, pulselevel, pkkmediana, pkkpulselevel;
+// uint32_t b1, b2, b3, b4, b5, b6, b7, b8;
+uint32_t p1, p2, p3, p4, p5, p6;
 uint dec1, dec2, dec3, dec4, dec5;
 uint32_t i, j, pkkoffs, pkkend;
 uint okval;
@@ -1712,7 +1713,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
           ) 
         {
 
-        okval = decodeKEY(m, j+pkkoffs); // 6 - OK1, 0 - OK2, 5 - OK3
+        okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 
         //Print result
             printf("%s - OK2 OK RKK=000 [%d<%d - %d<%d - %d<%d] %d>%d MED=%d OK2VAL(0)=%d\n",
@@ -1855,175 +1856,89 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
         pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
         pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
+        //декодирование ключевого кода
+        okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 
-        p1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-        p2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-        p3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-        p4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-        p5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-        p6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-
-        if( //110
-            p1>p2 &&    //10
-            p3>p4 &&    //10
-            p5<p6       //01
-          ) 
+        if(okval==6)
         {
-
-        okval = decodeKEY(m, j+pkkoffs); // 6 - OK1, 0 - OK2, 5 - OK3
-
         //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
 
         //START DECADE 1 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
-
         //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
-        pkkend = pkkoffs + UVD_DECADE_LEN;
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        // pkkmediana = 0;
+        // pkkend = pkkoffs + UVD_DECADE_LEN;
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
-        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
-        //DECADE 1 - VALUE
-        dec1=0;
-        if(b1>b2) dec1=dec1 | 8;
-        if(b3>b4) dec1=dec1 | 4;    
-        if(b5>b6) dec1=dec1 | 2;    
-        if(b7>b8) dec1=dec1 | 1;
+        dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         dec1+=(int) '0';
         //END DECADE 1
 
         //START DECADE 2 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-
         //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
-        pkkend = pkkoffs + UVD_DECADE_LEN;
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
-
-        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
-        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
-        //DECADE 2 - VALUE
-        dec2=0;
-        if(b1>b2) dec2=dec2 | 8;
-        if(b3>b4) dec2=dec2 | 4;    
-        if(b5>b6) dec2=dec2 | 2;    
-        if(b7>b8) dec2=dec2 | 1;
+        // pkkmediana = 0;
+        // pkkend = pkkoffs + UVD_DECADE_LEN;
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         dec2+=(int) '0';
         //END DECADE 2
 
         //START DECADE 3 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-
         //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
-        pkkend = pkkoffs + UVD_DECADE_LEN;
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_DECADE_LEN;    
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        // pkkmediana = 0;
+        // pkkend = pkkoffs + UVD_DECADE_LEN;
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_DECADE_LEN;    
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
-        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
-        //DECADE 3 - VALUE
-        dec3=0;
-        if(b1>b2) dec3=dec3 | 8;
-        if(b3>b4) dec3=dec3 | 4;    
-        if(b5>b6) dec3=dec3 | 2;    
-        if(b7>b8) dec3=dec3 | 1;
+        dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         dec3+=(int) '0';
         //END DECADE 3
 
         //START DECADE 4 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+        // //определение среднего значения в ряде периодов для выделения посылки над помехами
+        // pkkmediana = 0;
+        // pkkend = pkkoffs + UVD_DECADE_LEN;
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-        //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
-        pkkend = pkkoffs + UVD_DECADE_LEN;
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
-
-        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
-        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
-        //DECADE 4 - VALUE
-        dec4=0;
-        if(b1>b2) dec4=dec4 | 8;
-        if(b3>b4) dec4=dec4 | 4;    
-        if(b5>b6) dec4=dec4 | 2;    
-        if(b7>b8) dec4=dec4 | 1;
+        dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         dec4+=(int) '0';
         //END DECADE 4
 
         //START DECADE 5 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-
         //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
-        pkkend = pkkoffs + UVD_DECADE_LEN;
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        // pkkmediana = 0;
+        // pkkend = pkkoffs + UVD_DECADE_LEN;
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-        b1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-        b2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-        b3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-        b4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-        b5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-        b6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-        b7 = (uint32_t) (m[j+pkkoffs+48]+m[j+pkkoffs+49]+m[j+pkkoffs+50]+m[j+pkkoffs+51]+m[j+pkkoffs+52]+m[j+pkkoffs+53]+m[j+pkkoffs+54]+m[j+pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
-        b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
-        //DECADE 5 - VALUE
-        dec5=0;
-        if(b1>b2) dec5=dec5 | 1;
-        dec5 = dec5<<1; //10
-        if(b3>b4) dec5=dec5 | 1;
-        dec5 = dec5<<1; //110       
-        if(b5>b6) dec5=dec5 | 1;
-        dec5 = dec5<<1; //1110     
-        if(b7>b8) dec5=dec5 | 1;
+        dec5 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         dec5+=(int) '0';
         //END DECADE 5
 
@@ -2179,7 +2094,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
           ) 
         {
         
-        okval = decodeKEY(m, j+pkkoffs); // 6 - OK1, 0 - OK2, 5 - OK3
+        okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 
 
             for(i=0;i<UVD_MAX_LEN;i++) {
