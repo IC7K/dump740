@@ -1353,22 +1353,22 @@ for (i = pkkoffs; i < pkkend; i++) {
 pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
 pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-p1 = decodePOS(m, pkkoffs,    pkkpulselevel);
-p2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
-p3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
-p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
-p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
-p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
+// p1 = decodePOS(m, pkkoffs,    pkkpulselevel);
+// p2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
+// p3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
+// p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
+// p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
+// p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
 
-// p1 = (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-// p2 = (uint32_t) (m[pkkoffs+8]+m[pkkoffs+9]+m[pkkoffs+10]+m[pkkoffs+11]+m[pkkoffs+12]+m[pkkoffs+13]+m[pkkoffs+14]+m[pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-// p3 = (uint32_t) (m[pkkoffs+16]+m[pkkoffs+17]+m[pkkoffs+18]+m[pkkoffs+19]+m[pkkoffs+20]+m[pkkoffs+21]+m[pkkoffs+22]+m[pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-// p4 = (uint32_t) (m[pkkoffs+24]+m[pkkoffs+25]+m[pkkoffs+26]+m[pkkoffs+27]+m[pkkoffs+28]+m[pkkoffs+29]+m[pkkoffs+30]+m[pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-// p5 = (uint32_t) (m[pkkoffs+32]+m[pkkoffs+33]+m[pkkoffs+34]+m[pkkoffs+35]+m[pkkoffs+36]+m[pkkoffs+37]+m[pkkoffs+38]+m[pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-// p6 = (uint32_t) (m[pkkoffs+40]+m[pkkoffs+41]+m[pkkoffs+42]+m[pkkoffs+43]+m[pkkoffs+44]+m[pkkoffs+45]+m[pkkoffs+46]+m[pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+p1 = (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+p2 = (uint32_t) (m[pkkoffs+8]+m[pkkoffs+9]+m[pkkoffs+10]+m[pkkoffs+11]+m[pkkoffs+12]+m[pkkoffs+13]+m[pkkoffs+14]+m[pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+p3 = (uint32_t) (m[pkkoffs+16]+m[pkkoffs+17]+m[pkkoffs+18]+m[pkkoffs+19]+m[pkkoffs+20]+m[pkkoffs+21]+m[pkkoffs+22]+m[pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+p4 = (uint32_t) (m[pkkoffs+24]+m[pkkoffs+25]+m[pkkoffs+26]+m[pkkoffs+27]+m[pkkoffs+28]+m[pkkoffs+29]+m[pkkoffs+30]+m[pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+p5 = (uint32_t) (m[pkkoffs+32]+m[pkkoffs+33]+m[pkkoffs+34]+m[pkkoffs+35]+m[pkkoffs+36]+m[pkkoffs+37]+m[pkkoffs+38]+m[pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+p6 = (uint32_t) (m[pkkoffs+40]+m[pkkoffs+41]+m[pkkoffs+42]+m[pkkoffs+43]+m[pkkoffs+44]+m[pkkoffs+45]+m[pkkoffs+46]+m[pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
 
 result = 0;
-result = (p1 < p2) ? 0 : 4 | (p3 < p4) ? 0 : 2 | (p5 < p6) ? 0 : 1;
+result = ((p1 < p2) ? 0 : 4) | ((p3 < p4) ? 0 : 2) | ((p5 < p6) ? 0 : 1);
 
 return result; 
 
@@ -1402,6 +1402,11 @@ result = (b1 < b2) ? 0 : 8 | (b3 < b4) ? 0 : 4 | (b5 < b6) ? 0 : 2 | (b7 < b8) ?
 
 return result; 
 } //end decodeDECADE
+
+
+uint testFUNC(uint16_t *m, uint32_t j) {
+    return m[j];
+}
 
 
 /* Detect a UVD responses inside the magnitude buffer pointed by 'm' and of
@@ -1482,7 +1487,7 @@ void detectUVD(uint16_t *m, uint32_t mlen) {
 uint32_t mediana, pulselevel, pkkmediana, pkkpulselevel, p1, p2, p3, p4, p5, p6;
 uint32_t b1, b2, b3, b4, b5, b6, b7, b8;
 uint dec1, dec2, dec3, dec4, dec5;
-uint i, j, pkkoffs, pkkend;
+uint32_t i, j, pkkoffs, pkkend;
 uint okval;
 // char regnumber[6];
 // time_t t;
@@ -1492,7 +1497,9 @@ uint okval;
 //сканирование буффера длиной mlen
 for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
-    // printf("VAL=%d ", m[j]);
+
+
+    // printf("VAL=%d FUNC=%d\n", m[j], testFUNC(m,j));
 
     //определение среднего значения в ряде периодов для выделения посылки над помехами
     mediana = 0;
@@ -1862,12 +1869,9 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
         //DECADE 1 - VALUE
         dec1=0;
-        if(b1>b2) dec1=dec1 | 1;
-        dec1 = dec1<<1; //10
-        if(b3>b4) dec1=dec1 | 1;
-        dec1 = dec1<<1; //110       
-        if(b5>b6) dec1=dec1 | 1;
-        dec1 = dec1<<1; //1110     
+        if(b1>b2) dec1=dec1 | 8;
+        if(b3>b4) dec1=dec1 | 4;    
+        if(b5>b6) dec1=dec1 | 2;    
         if(b7>b8) dec1=dec1 | 1;
         dec1+=(int) '0';
         //END DECADE 1
@@ -1895,12 +1899,9 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
         //DECADE 2 - VALUE
         dec2=0;
-        if(b1>b2) dec2=dec2 | 1;
-        dec2 = dec2<<1; //10
-        if(b3>b4) dec2=dec2 | 1;
-        dec2 = dec2<<1; //110       
-        if(b5>b6) dec2=dec2 | 1;
-        dec2 = dec2<<1; //1110     
+        if(b1>b2) dec2=dec2 | 8;
+        if(b3>b4) dec2=dec2 | 4;    
+        if(b5>b6) dec2=dec2 | 2;    
         if(b7>b8) dec2=dec2 | 1;
         dec2+=(int) '0';
         //END DECADE 2
@@ -1928,12 +1929,9 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
         //DECADE 3 - VALUE
         dec3=0;
-        if(b1>b2) dec3=dec3 | 1;
-        dec3 = dec3<<1; //10
-        if(b3>b4) dec3=dec3 | 1;
-        dec3 = dec3<<1; //110       
-        if(b5>b6) dec3=dec3 | 1;
-        dec3 = dec3<<1; //1110     
+        if(b1>b2) dec3=dec3 | 8;
+        if(b3>b4) dec3=dec3 | 4;    
+        if(b5>b6) dec3=dec3 | 2;    
         if(b7>b8) dec3=dec3 | 1;
         dec3+=(int) '0';
         //END DECADE 3
@@ -1961,12 +1959,9 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         b8 = (uint32_t) (m[j+pkkoffs+56]+m[j+pkkoffs+57]+m[j+pkkoffs+58]+m[j+pkkoffs+59]+m[j+pkkoffs+60]+m[j+pkkoffs+61]+m[j+pkkoffs+62]+m[j+pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
         //DECADE 4 - VALUE
         dec4=0;
-        if(b1>b2) dec4=dec4 | 1;
-        dec4 = dec4<<1; //10
-        if(b3>b4) dec4=dec4 | 1;
-        dec4 = dec4<<1; //110       
-        if(b5>b6) dec4=dec4 | 1;
-        dec4 = dec4<<1; //1110     
+        if(b1>b2) dec4=dec4 | 8;
+        if(b3>b4) dec4=dec4 | 4;    
+        if(b5>b6) dec4=dec4 | 2;    
         if(b7>b8) dec4=dec4 | 1;
         dec4+=(int) '0';
         //END DECADE 4
@@ -2018,7 +2013,7 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
             //     pulselevel,
             //     mediana
             //     );
-            printf("%s - OK1 OK RKK=110  OK1VAL(6)=%d REGN=%c%c%c%c%c\n", timestr, okval, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1);
+            printf("%s - OK1 OK RKK=110 REGN=%c%c%c%c%c OK1VAL(6)=%d\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1, okval);
 
             j+=UVD_KOORD_KODE_LEN+UVD_OK1_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
             continue;
@@ -2144,9 +2139,10 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
             p5>p6       //10
           ) 
         {
-            okval = decodeKEY(m, j+pkkoffs); // 6 - OK1, 0 - OK2, 5 - OK3
+        
+        okval = decodeKEY(m, j+pkkoffs); // 6 - OK1, 0 - OK2, 5 - OK3
 
-            printf("%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d OK3VAL=%d MED=%d\n",
+            printf("%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d OK3VAL(5)=%d MED=%d\n",
                 timestr,
                 m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
                 m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
