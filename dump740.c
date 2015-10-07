@@ -1376,13 +1376,13 @@ return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4
 
 } //end decodePOS
 
-uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+// uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 
-// printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
-printf("%d", (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0);
-return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
+// // printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
+// printf("%d", (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0);
+// return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
 
-} //end decodePOS
+// } //end decodePOS
 
 // 6 - OK1, 0 - OK2, 5 - OK3
 uint decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
@@ -1540,8 +1540,10 @@ uint okval;
     uint16_t marrwrite[UVD_MAX_LEN];
 
     printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
-    printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
-    FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
+    // printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
+    // FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
+    printf("Read ok2-12-11-11-284.data for RA-26001\n\n");
+    FILE *ifp = fopen("ok2-12-11-11-284.data", "rb");    
     //fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
     // fread(clientdata, sizeof(char), sizeof(clientdata), ifp);
     fread(marrwrite, sizeof(uint16_t), sizeof(marrwrite), ifp);
@@ -1701,32 +1703,23 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
     */      
 
 
+
         //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
+        // pkkmediana = 0;
         pkkoffs = UVD_OK2_OFFS; //50
-        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=97
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        // pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=97
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-        p1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-        p2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-        p3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-        p4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-        p5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-        p6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-
-        if( //000
-            p1<p2 &&    //01
-            p3<p4 &&    //01
-            p5<p6       //01
-          ) 
-        {
-
+        pkkpulselevel = pulselevel;
+        //декодирование ключевого кода
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 
+        if(okval == 0)
+        {
         //Print result
             printf("%s - OK2 OK RKK=000 [%d<%d - %d<%d - %d<%d] %d>%d MED=%d OK2VAL(0)=%d\n",
                 timestr,
@@ -1745,14 +1738,14 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
             
 
-            for(i=0;i<UVD_MAX_LEN;i++) {
-            marrwrite[i] = m[j+i];
-            }
+            // for(i=0;i<UVD_MAX_LEN;i++) {
+            // marrwrite[i] = m[j+i];
+            // }
 
-            sprintf(filestr, "ok2-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
-            FILE *f = fopen(filestr, "wb");
-            fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
-            fclose(f);
+            // sprintf(filestr, "ok2-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
+            // FILE *f = fopen(filestr, "wb");
+            // fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
+            // fclose(f);
 
 
             j+=UVD_KOORD_KODE_LEN+UVD_OK2_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
