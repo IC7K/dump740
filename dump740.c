@@ -1425,25 +1425,47 @@ uint32_t p1, p2, p3, p4, p5, p6;
 int dec1, dec2, dec3, dec4, dec5;
 uint32_t i, j, pkkoffs, pkkend;
 uint okval;
+uint windowlen;
 // char regnumber[6];
 // time_t t;
 // uint32_t hashval;
 // time_t now = time(NULL);
-    uint16_t marrwrite[UVD_MAX_LEN];
+   
+  //+++++++++++++++ TEST FILE LOAD ++++++++++++++++++++ 
+  // uint16_t* marrwrite;
+  // uint32_t lSize;
+  // size_t result;
+  //   printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
+  //   // printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
+  //   // FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
+  //   printf("Read ok2.data for RA-26001\n\n");
+  //   FILE *ifp = fopen("ok2-12-11-11-284.data", "rb");  
+  //   if(ifp==NULL) { printf("ERR OPEN FILE!"); exit(1); }
 
-    // printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
-    // printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
-    // FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
-    // // printf("Read ok2.data for RA-26001\n\n");
-    // // FILE *ifp = fopen("ok2-12-11-11-284.data", "rb");    
-    // //fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
-    // // fread(clientdata, sizeof(char), sizeof(clientdata), ifp);
-    // fread(marrwrite, sizeof(uint16_t), sizeof(marrwrite), ifp);
-    // fclose(ifp);
+  //     // obtain file size:
+  //     fseek (ifp , 0 , SEEK_END);
+  //     lSize = ftell (ifp);
+  //     rewind (ifp);
 
-    // for(i=0;i<UVD_MAX_LEN;i++) {
-    // m[i]=marrwrite[i];
-    // }
+  //   printf("File size=%d\n",lSize);
+
+
+  // // allocate memory to contain the whole file:
+  //   marrwrite = (uint16_t*) malloc (lSize);
+
+  //   //result = 
+  //   result = fread(marrwrite, sizeof(uint16_t), lSize, ifp);
+
+  //   if (result != (lSize/sizeof(uint16_t))) {printf("ERROR - Reading %d, but need %d\n", result, lSize/sizeof(uint16_t)); exit (3);}
+
+  //   fclose(ifp);
+
+  //   for(i=0;i<result;i++) {
+  //   m[i]=marrwrite[i];
+  //   // printf("%x ", m[i]);
+  //   }
+  //+++++++++++++++ TEST FILE LOAD ++++++++++++++++++++ 
+
 
 //сканирование буффера длиной mlen
 for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
@@ -1454,11 +1476,11 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
     //определение среднего значения в ряде периодов для выделения посылки над помехами
     mediana = 0;
-    for (i = 0; i < UVD_MAX_LEN; i++) { 
+    windowlen = UVD_KOORD_KODE_LEN;
+    for (i = 0; i < windowlen; i++) { 
         mediana+=m[j+i]; //SUMM(ALL)
-    }
-    
-    mediana = mediana / UVD_KOORD_KODE_LEN;
+    }  
+    mediana = mediana / windowlen;
 
     pulselevel = mediana / 2 + mediana;
 
@@ -2571,11 +2593,15 @@ int main(int argc, char **argv) {
     }
 
 
+#include </home/pi/dump740/startupnoisecheck.c>
 
     /* Create the thread that will read the data from the device. */
     pthread_create(&Modes.reader_thread, NULL, readerThreadEntryPoint, NULL);
 
     pthread_mutex_lock(&Modes.data_mutex);
+
+    // int counternoise = 0;
+
     while(1) {
         if (!Modes.data_ready) {
             pthread_cond_wait(&Modes.data_cond,&Modes.data_mutex);
@@ -2594,7 +2620,9 @@ int main(int argc, char **argv) {
          * slow processors). */
         pthread_mutex_unlock(&Modes.data_mutex);
 
-        detectUVD(Modes.magnitude, Modes.data_len/2);
+        // if (counternoise < 10 ) { startupNOISE(Modes.magnitude, Modes.data_len/2); counternoise++; }
+        // else 
+            detectUVD(Modes.magnitude, Modes.data_len/2);
 
         backgroundTasks();
         pthread_mutex_lock(&Modes.data_mutex);
