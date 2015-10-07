@@ -1376,16 +1376,16 @@ return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4
 
 } //end decodePOS
 
-uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+// uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 
-// printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
-printf("%d", (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0);
-return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
+// // printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
+// printf("%d", (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0);
+// return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
 
-} //end decodePOS
+// } //end decodePOS
 
 // 6 - OK1, 0 - OK2, 5 - OK3
-uint decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+int decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;    
 uint result, p1, p2, p3, p4, p5, p6;
 
@@ -1405,15 +1405,22 @@ p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
 p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
 p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
 
-result = 0;
-result = ((p1 < p2) ? 0 : 4) | ((p3 < p4) ? 0 : 2) | ((p5 < p6) ? 0 : 1);
-
+if(p1==p2 || p3==p4 || p5==p6)
+    {
+        //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
+        result = -1;
+    }
+else
+    {
+        result = 0;
+        result = ((p1 < p2) ? 0 : 4) | ((p3 < p4) ? 0 : 2) | ((p5 < p6) ? 0 : 1);
+    }
 return result; 
 
 } //end decodeKEY
 
 
-uint decodeDECADE(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+int decodeDECADE(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;
 uint result, b1, b2, b3, b4, b5, b6, b7, b8;
 
@@ -1440,13 +1447,21 @@ b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
 b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 // printf("  END DECADE\n");
 
-result = 0;
-result = ((b1 < b2) ? 0 : 1) | ((b3 < b4) ? 0 : 2) | ((b5 < b6) ? 0 : 4) | ((b7 < b8) ? 0 : 8);
+if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
+    {
+        //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
+        result = -1;
+    }
+else
+    {
+        result = 0;
+        result = ((b1 < b2) ? 0 : 1) | ((b3 < b4) ? 0 : 2) | ((b5 < b6) ? 0 : 4) | ((b7 < b8) ? 0 : 8);
+    }
 
 return result; 
 } //end decodeDECADE
 
-uint decodeDECADEFUEL(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+int decodeDECADEFUEL(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;
 uint result, b1, b2, b3, b4, b5, b6, b7, b8;
 
@@ -1473,8 +1488,16 @@ b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
 b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 // printf("  END DECADE\n");
 
-result = 0;
-result = ((b1 < b2) ? 0 : 8) | ((b3 < b4) ? 0 : 4) | ((b5 < b6) ? 0 : 2) | ((b7 < b8) ? 0 : 1);
+if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
+    {
+        //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
+        result = -1;
+    }
+else
+    {
+    result = 0;
+    result = ((b1 < b2) ? 0 : 8) | ((b3 < b4) ? 0 : 4) | ((b5 < b6) ? 0 : 2) | ((b7 < b8) ? 0 : 1);
+    }
 
 return result; 
 } //end decodeDECADEFUEL
@@ -1563,7 +1586,7 @@ void detectUVD(uint16_t *m, uint32_t mlen) {
 uint32_t mediana, pulselevel, pkkmediana, pkkpulselevel;
 // uint32_t b1, b2, b3, b4, b5, b6, b7, b8;
 uint32_t p1, p2, p3, p4, p5, p6;
-uint dec1, dec2, dec3, dec4, dec5;
+int dec1, dec2, dec3, dec4, dec5;
 uint32_t i, j, pkkoffs, pkkend;
 uint okval;
 // char regnumber[6];
@@ -1572,19 +1595,19 @@ uint okval;
 // time_t now = time(NULL);
     uint16_t marrwrite[UVD_MAX_LEN];
 
-    printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
-    // printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
-    // FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
-    printf("Read ok2.data for RA-26001\n\n");
-    FILE *ifp = fopen("ok2-12-11-11-284.data", "rb");    
-    //fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
-    // fread(clientdata, sizeof(char), sizeof(clientdata), ifp);
-    fread(marrwrite, sizeof(uint16_t), sizeof(marrwrite), ifp);
-    fclose(ifp);
+    // printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
+    // // printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
+    // // FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
+    // printf("Read ok2.data for RA-26001\n\n");
+    // FILE *ifp = fopen("ok2-12-11-11-284.data", "rb");    
+    // //fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
+    // // fread(clientdata, sizeof(char), sizeof(clientdata), ifp);
+    // fread(marrwrite, sizeof(uint16_t), sizeof(marrwrite), ifp);
+    // fclose(ifp);
 
-    for(i=0;i<UVD_MAX_LEN;i++) {
-    m[i]=marrwrite[i];
-    }
+    // for(i=0;i<UVD_MAX_LEN;i++) {
+    // m[i]=marrwrite[i];
+    // }
 
 //сканирование буффера длиной mlen
 for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
@@ -1749,7 +1772,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
         pkkpulselevel = pulselevel;
         //декодирование ключевого кода
-        okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
+        okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3, -1 - ERROR
 
         if(okval == 0)
         {
@@ -1758,27 +1781,32 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
         pkkpulselevel = pulselevel;
 
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec1==-1) continue; //11 или 00 вместо 10 или 01
         dec1+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec2==-1) continue; //11 или 00 вместо 10 или 01
         dec2+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec3==-1) continue; //11 или 00 вместо 10 или 01
         dec3+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec4==-1) continue; //11 или 00 вместо 10 или 01
         dec4+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec5 = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
-        
+        if(dec5==-1) continue; //11 или 00 вместо 10 или 01
+
         int fuel = (dec5<10) ? dec5*5 : (dec5-5)*10;
 
         // следущее - это повторение
@@ -1800,7 +1828,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
             //     okval
             //     );
 
-        printf("%s - OK2 OK RKK=000 0 ALT=%c%c%c%cm  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, fuel);            
+        printf("%s - OK2 OK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, fuel);            
 
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];
@@ -1927,7 +1955,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
         pkkpulselevel = pulselevel;
         //декодирование ключевого кода
-        okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
+        okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3, -1 - ERROR
 
         if(okval==6)
         {
@@ -1946,6 +1974,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
         // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec1==-1) continue; //11 или 00 вместо 10 или 01
         dec1+=(int) '0';
         //END DECADE 1
 
@@ -1961,6 +1990,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
         // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
         // pkkpulselevel = pkkmediana / 2 + pkkmediana;
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec2==-1) continue; //11 или 00 вместо 10 или 01
         dec2+=(int) '0';
         //END DECADE 2
 
@@ -1977,6 +2007,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
         // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
         dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec3==-1) continue; //11 или 00 вместо 10 или 01
         dec3+=(int) '0';
         //END DECADE 3
 
@@ -1993,6 +2024,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
         // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
         dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec4==-1) continue; //11 или 00 вместо 10 или 01
         dec4+=(int) '0';
         //END DECADE 4
 
@@ -2009,6 +2041,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
         // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
         dec5 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec5==-1) continue; //11 или 00 вместо 10 или 01
         dec5+=(int) '0';
         //END DECADE 5
 
