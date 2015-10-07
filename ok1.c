@@ -191,6 +191,58 @@
         dec5+=(int) '0';
         //END DECADE 5
 
+
+        //REPEAT DECADES
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec1r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec1r==-1) continue; //11 или 00 вместо 10 или 01
+        dec1r+=(int) '0';
+        if(dec1r!=dec1) continue; 
+        //END DECADE 1
+
+        //START DECADE 2 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec2r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec2r==-1) continue; //11 или 00 вместо 10 или 01
+        dec2r+=(int) '0';
+        if(dec2r!=dec2) continue;
+        //END DECADE 2
+
+        //START DECADE 3 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec3r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec3r==-1) continue; //11 или 00 вместо 10 или 01
+        dec3r+=(int) '0';
+        if(dec3r!=dec3) continue;
+        //END DECADE 3
+
+        //START DECADE 4 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec4r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec4r==-1) continue; //11 или 00 вместо 10 или 01
+        dec4r+=(int) '0';
+        if(dec4r!=dec4) continue;
+        //END DECADE 4
+
+        //START DECADE 5 - bits for positions
+        //8*8=64 periods of 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec5r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec5r==-1) continue; //11 или 00 вместо 10 или 01
+        dec5r+=(int) '0';
+        if(dec5r!=dec5) continue;
+        //END DECADE 5
+
+
+
         //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
 
             // printf("%s - OK1 OK RKK=110 [%d>%d - %d>%d - %d<%d] %d>%d MED=%d\n",

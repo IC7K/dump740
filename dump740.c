@@ -1423,6 +1423,7 @@ uint32_t mediana, pulselevel, pkkmediana, pkkpulselevel;
 // uint32_t b1, b2, b3, b4, b5, b6, b7, b8;
 uint32_t p1, p2, p3, p4, p5, p6;
 int dec1, dec2, dec3, dec4, dec5;
+int dec1r, dec2r, dec3r, dec4r, dec5r;
 uint32_t i, j, pkkoffs, pkkend;
 uint okval;
 uint windowlen;

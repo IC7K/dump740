@@ -151,8 +151,43 @@
 
         int fuel = (dec5<10) ? dec5*5 : (dec5-5)*10;
 
+        //REPEAT DECADES
         // следущее - это повторение
-        // pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec1r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec1r==-1) continue; //11 или 00 вместо 10 или 01
+        dec1r+=(int) '0';
+        if(dec1r!=dec1) continue; 
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec2r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec2r==-1) continue; //11 или 00 вместо 10 или 01
+        dec2r+=(int) '0';
+        if(dec2r!=dec2) continue; 
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec3r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec3r==-1) continue; //11 или 00 вместо 10 или 01
+        dec3r+=(int) '0';
+        if(dec3r!=dec3) continue; 
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec4r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        if(dec4r==-1) continue; //11 или 00 вместо 10 или 01
+        dec4r+=(int) '0';
+        if(dec4r!=dec4) continue; 
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec5r = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
+        if(dec5r==-1) continue; //11 или 00 вместо 10 или 01
+        if(dec5r!=dec5) continue; 
+
+        // int fuelr = (dec5r<10) ? dec5r*5 : (dec5r-5)*10;
 
         //Print result
             // printf("%s - OK2 OK RKK=000 [%d<%d - %d<%d - %d<%d] %d>%d MED=%d OK2VAL(0)=%d\n",
