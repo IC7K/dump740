@@ -1332,6 +1332,13 @@ void applyPhaseCorrection(uint16_t *m) {
 
 
 
+uint decodePOS(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+
+return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
+
+} //end decodePOS
+
+
 // 6 - OK1, 0 - OK2, 5 - OK3
 uint decodeKEY(uint16_t *m, uint32_t pkkoffs) {
 uint32_t pkkmediana, pkkpulselevel, i, pkkend;
@@ -1346,12 +1353,19 @@ for (i = pkkoffs; i < pkkend; i++) {
 pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
 pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-p1 = (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-p2 = (uint32_t) (m[pkkoffs+8]+m[pkkoffs+9]+m[pkkoffs+10]+m[pkkoffs+11]+m[pkkoffs+12]+m[pkkoffs+13]+m[pkkoffs+14]+m[pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-p3 = (uint32_t) (m[pkkoffs+16]+m[pkkoffs+17]+m[pkkoffs+18]+m[pkkoffs+19]+m[pkkoffs+20]+m[pkkoffs+21]+m[pkkoffs+22]+m[pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-p4 = (uint32_t) (m[pkkoffs+24]+m[pkkoffs+25]+m[pkkoffs+26]+m[pkkoffs+27]+m[pkkoffs+28]+m[pkkoffs+29]+m[pkkoffs+30]+m[pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-p5 = (uint32_t) (m[pkkoffs+32]+m[pkkoffs+33]+m[pkkoffs+34]+m[pkkoffs+35]+m[pkkoffs+36]+m[pkkoffs+37]+m[pkkoffs+38]+m[pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-p6 = (uint32_t) (m[pkkoffs+40]+m[pkkoffs+41]+m[pkkoffs+42]+m[pkkoffs+43]+m[pkkoffs+44]+m[pkkoffs+45]+m[pkkoffs+46]+m[pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+p1 = decodePOS(m, pkkoffs,    pkkpulselevel);
+p2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
+p3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
+p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
+p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
+p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
+
+// p1 = (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+// p2 = (uint32_t) (m[pkkoffs+8]+m[pkkoffs+9]+m[pkkoffs+10]+m[pkkoffs+11]+m[pkkoffs+12]+m[pkkoffs+13]+m[pkkoffs+14]+m[pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+// p3 = (uint32_t) (m[pkkoffs+16]+m[pkkoffs+17]+m[pkkoffs+18]+m[pkkoffs+19]+m[pkkoffs+20]+m[pkkoffs+21]+m[pkkoffs+22]+m[pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+// p4 = (uint32_t) (m[pkkoffs+24]+m[pkkoffs+25]+m[pkkoffs+26]+m[pkkoffs+27]+m[pkkoffs+28]+m[pkkoffs+29]+m[pkkoffs+30]+m[pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+// p5 = (uint32_t) (m[pkkoffs+32]+m[pkkoffs+33]+m[pkkoffs+34]+m[pkkoffs+35]+m[pkkoffs+36]+m[pkkoffs+37]+m[pkkoffs+38]+m[pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+// p6 = (uint32_t) (m[pkkoffs+40]+m[pkkoffs+41]+m[pkkoffs+42]+m[pkkoffs+43]+m[pkkoffs+44]+m[pkkoffs+45]+m[pkkoffs+46]+m[pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
 
 result = 0;
 result = (p1 < p2) ? 0 : 4 | (p3 < p4) ? 0 : 2 | (p5 < p6) ? 0 : 1;
