@@ -1376,6 +1376,13 @@ return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4
 
 } //end decodePOS
 
+uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+
+// printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
+printf("%d", (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0);
+return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
+
+} //end decodePOS
 
 // 6 - OK1, 0 - OK2, 5 - OK3
 uint decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
@@ -1419,17 +1426,22 @@ uint result, b1, b2, b3, b4, b5, b6, b7, b8;
 // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
 // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
+// printf("START DECADE ");
 b1 = decodePOS(m, pkkoffs,    pkkpulselevel);
 b2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
+// printf(" ");
 b3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
 b4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
+// printf(" ");
 b5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
 b6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
+// printf(" ");
 b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
 b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
+// printf("  END DECADE\n");
 
 result = 0;
-result = ((b1 < b2) ? 0 : 8) | ((b3 < b4) ? 0 : 4) | ((b5 < b6) ? 0 : 2) | ((b7 < b8) ? 0 : 1);
+result = ((b1 < b2) ? 0 : 1) | ((b3 < b4) ? 0 : 2) | ((b5 < b6) ? 0 : 4) | ((b7 < b8) ? 0 : 8);
 
 return result; 
 } //end decodeDECADE
@@ -1847,15 +1859,16 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
     */     
         //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
+        // pkkmediana = 0;
         pkkoffs = UVD_OK1_OFFS; //45
-        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=93
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        // pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=93
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
+        pkkpulselevel = pulselevel;
         //декодирование ключевого кода
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 
