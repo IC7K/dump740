@@ -1542,7 +1542,7 @@ uint okval;
     printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
     // printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
     // FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
-    printf("Read ok2-12-11-11-284.data for RA-26001\n\n");
+    printf("Read ok2.data for RA-26001\n\n");
     FILE *ifp = fopen("ok2-12-11-11-284.data", "rb");    
     //fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
     // fread(clientdata, sizeof(char), sizeof(clientdata), ifp);
@@ -1720,23 +1720,53 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
         if(okval == 0)
         {
-        //Print result
-            printf("%s - OK2 OK RKK=000 [%d<%d - %d<%d - %d<%d] %d>%d MED=%d OK2VAL(0)=%d\n",
-                timestr,
-                m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
-                m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
-                m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
-                m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
-                m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
-                m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
-                m[j],
-                pulselevel,
-                mediana,
-                // 6 - OK1, 0 - OK2, 5 - OK3
-                okval
-                );
 
-            
+        pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
+        pkkpulselevel = pulselevel;
+
+        dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec1+=(int) '0';
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec2+=(int) '0';
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec3+=(int) '0';
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec4+=(int) '0';
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        dec5 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec5+=(int) '0';
+
+        // следущее - это повторение
+        // pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        //Print result
+            // printf("%s - OK2 OK RKK=000 [%d<%d - %d<%d - %d<%d] %d>%d MED=%d OK2VAL(0)=%d\n",
+            //     timestr,
+            //     m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
+            //     m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
+            //     m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
+            //     m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
+            //     m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
+            //     m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
+            //     m[j],
+            //     pulselevel,
+            //     mediana,
+            //     // 6 - OK1, 0 - OK2, 5 - OK3
+            //     okval
+            //     );
+
+        printf("%s - OK2 OK RKK=000 0 ALT=%c%c%c%cm  FUEL=%c\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, (char) dec5);            
 
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];
@@ -1962,7 +1992,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
             //     pulselevel,
             //     mediana
             //     );
-            printf("%s - OK1 OK RKK=110 REGN=%c%c%c%c%c OK1VAL(6)=%d\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1, okval);
+            printf("%s - OK1 OK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1);
 
 
             // for(i=0;i<UVD_MAX_LEN;i++) {
