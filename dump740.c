@@ -1330,14 +1330,16 @@ void applyPhaseCorrection(uint16_t *m) {
     }
 }
 
+
+
 // 6 - OK1, 0 - OK2, 5 - OK3
 uint decodeKEY(uint16_t *m, uint32_t pkkoffs) {
-uint32_t pkkmediana, pkkpulselevel, p1, p2, p3, p4, p5, p6, i, pkkend;
-uint result;
+uint32_t pkkmediana, pkkpulselevel, i, pkkend;
+uint result, p1, p2, p3, p4, p5, p6;
 
 //определение среднего значения в ряде периодов для выделения посылки над помехами
 pkkmediana = 0;
-pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=97
+pkkend = pkkoffs + UVD_KEY_KODE_LEN;
 for (i = pkkoffs; i < pkkend; i++) { 
     pkkmediana+=m[i]; //SUMM(ALL)
 }    
@@ -1352,11 +1354,40 @@ p5 = (uint32_t) (m[pkkoffs+32]+m[pkkoffs+33]+m[pkkoffs+34]+m[pkkoffs+35]+m[pkkof
 p6 = (uint32_t) (m[pkkoffs+40]+m[pkkoffs+41]+m[pkkoffs+42]+m[pkkoffs+43]+m[pkkoffs+44]+m[pkkoffs+45]+m[pkkoffs+46]+m[pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
 
 result = 0;
-result = (p1<p2) ? 0 : 4 | (p3 < p4) ? 0 : 2 | (p5 < p6) ? 0 : 1;
+result = (p1 < p2) ? 0 : 4 | (p3 < p4) ? 0 : 2 | (p5 < p6) ? 0 : 1;
 
 return result; 
 
 } //end decodeKEY
+
+
+uint decodeDECADE(uint16_t *m, uint32_t pkkoffs) {
+uint32_t pkkmediana, pkkpulselevel, i, pkkend;
+uint result, b1, b2, b3, b4, b5, b6, b7, b8;
+
+//определение среднего значения в ряде периодов для выделения посылки над помехами
+pkkmediana = 0;
+pkkend = pkkoffs + UVD_DECADE_LEN;
+for (i = pkkoffs; i < pkkend; i++) { 
+    pkkmediana+=m[i]; //SUMM(ALL)
+}    
+pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
+b1 = (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
+b2 = (uint32_t) (m[pkkoffs+8]+m[pkkoffs+9]+m[pkkoffs+10]+m[pkkoffs+11]+m[pkkoffs+12]+m[pkkoffs+13]+m[pkkoffs+14]+m[pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
+b3 = (uint32_t) (m[pkkoffs+16]+m[pkkoffs+17]+m[pkkoffs+18]+m[pkkoffs+19]+m[pkkoffs+20]+m[pkkoffs+21]+m[pkkoffs+22]+m[pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
+b4 = (uint32_t) (m[pkkoffs+24]+m[pkkoffs+25]+m[pkkoffs+26]+m[pkkoffs+27]+m[pkkoffs+28]+m[pkkoffs+29]+m[pkkoffs+30]+m[pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
+b5 = (uint32_t) (m[pkkoffs+32]+m[pkkoffs+33]+m[pkkoffs+34]+m[pkkoffs+35]+m[pkkoffs+36]+m[pkkoffs+37]+m[pkkoffs+38]+m[pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
+b6 = (uint32_t) (m[pkkoffs+40]+m[pkkoffs+41]+m[pkkoffs+42]+m[pkkoffs+43]+m[pkkoffs+44]+m[pkkoffs+45]+m[pkkoffs+46]+m[pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+b7 = (uint32_t) (m[pkkoffs+48]+m[pkkoffs+49]+m[pkkoffs+50]+m[pkkoffs+51]+m[pkkoffs+52]+m[pkkoffs+53]+m[pkkoffs+54]+m[pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
+b8 = (uint32_t) (m[pkkoffs+56]+m[pkkoffs+57]+m[pkkoffs+58]+m[pkkoffs+59]+m[pkkoffs+60]+m[pkkoffs+61]+m[pkkoffs+62]+m[pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
+
+result = 0;
+result = (b1 < b2) ? 0 : 8 | (b3 < b4) ? 0 : 4 | (b5 < b6) ? 0 : 2 | (b7 < b8) ? 0 : 1;
+
+return result; 
+} //end decodeDECADE
 
 
 /* Detect a UVD responses inside the magnitude buffer pointed by 'm' and of
