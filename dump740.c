@@ -1376,13 +1376,13 @@ return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4
 
 } //end decodePOS
 
-// uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 
-// // printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
-// printf("%d", (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0);
-// return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
+// printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
+printf("%d", (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0);
+return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
 
-// } //end decodePOS
+} //end decodePOS
 
 // 6 - OK1, 0 - OK2, 5 - OK3
 uint decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
@@ -1446,10 +1446,43 @@ result = ((b1 < b2) ? 0 : 1) | ((b3 < b4) ? 0 : 2) | ((b5 < b6) ? 0 : 4) | ((b7 
 return result; 
 } //end decodeDECADE
 
+uint decodeDECADEFUEL(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+// uint32_t pkkmediana, pkkpulselevel, i, pkkend;
+uint result, b1, b2, b3, b4, b5, b6, b7, b8;
 
-uint testFUNC(uint16_t *m, uint32_t j) {
-    return m[j];
-}
+//определение среднего значения в ряде периодов для выделения посылки над помехами
+// pkkmediana = 0;
+// pkkend = pkkoffs + UVD_DECADE_LEN;
+// for (i = pkkoffs; i < pkkend; i++) { 
+//     pkkmediana+=m[i]; //SUMM(ALL)
+// }    
+// pkkmediana = pkkmediana / UVD_DECADE_LEN;     
+// pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
+// printf("START DECADE ");
+b1 = decodePOS(m, pkkoffs,    pkkpulselevel);
+b2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
+// printf(" ");
+b3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
+b4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
+// printf(" ");
+b5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
+b6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
+// printf(" ");
+b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
+b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
+// printf("  END DECADE\n");
+
+result = 0;
+result = ((b1 < b2) ? 0 : 8) | ((b3 < b4) ? 0 : 4) | ((b5 < b6) ? 0 : 2) | ((b7 < b8) ? 0 : 1);
+
+return result; 
+} //end decodeDECADEFUEL
+
+
+// uint testFUNC(uint16_t *m, uint32_t j) {
+//     return m[j];
+// }
 
 
 /* Detect a UVD responses inside the magnitude buffer pointed by 'm' and of
@@ -1744,8 +1777,9 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec5 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        dec5+=(int) '0';
+        dec5 = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
+        
+        int fuel = (dec5<10) ? dec5*5 : (dec5-5)*10;
 
         // следущее - это повторение
         // pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
@@ -1766,7 +1800,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
             //     okval
             //     );
 
-        printf("%s - OK2 OK RKK=000 0 ALT=%c%c%c%cm  FUEL=%c\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, (char) dec5);            
+        printf("%s - OK2 OK RKK=000 0 ALT=%c%c%c%cm  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, fuel);            
 
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];
