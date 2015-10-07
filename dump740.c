@@ -1330,6 +1330,44 @@ void applyPhaseCorrection(uint16_t *m) {
     }
 }
 
+/*
+12:11:09.991 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6 //ok1-12-11-09-991.data
+12:11:11.210 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:11.284 - OK2 OK RKK=000 [2605<10287 - 2520<8935 - 1589<9664] 1298>1000 MED=667 OK2VAL(0)=0
+12:11:23.345 - OK2 OK RKK=000 [4281<20339 - 3538<21294 - 3559<22631] 1440>1104 MED=736 OK2VAL(0)=0
+12:11:25.642 - OK2 OK RKK=000 [3114<19472 - 2754<20288 - 3114<20997] 2621>1800 MED=1200 OK2VAL(0)=0
+12:11:25.708 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:25.917 - OK2 OK RKK=000 [3474<17277 - 3029<18616 - 3412<18666] 1298>1072 MED=715 OK2VAL(0)=0
+12:11:25.980 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:26.350 - OK2 OK RKK=000 [2965<17440 - 2309<16474 - 3412<17557] 2546>1543 MED=1029 OK2VAL(0)=0
+12:11:29.153 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:30.503 - OK2 OK RKK=000 [3532<37667 - 2394<36262 - 3905<36564] 4694>3034 MED=2023 OK2VAL(0)=0
+12:11:43.626 - OK2 OK RKK=000 [2396<17005 - 3745<15686 - 3749<15650] 2277>1689 MED=1126 OK2VAL(0)=0
+12:11:44.545 - OK2 OK RKK=000 [3836<36384 - 4921<36642 - 3073<36475] 5192>2988 MED=1992 OK2VAL(0)=0
+12:11:44.758 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:48.359 - OK2 OK RKK=000 [3687<63406 - 3623<63221 - 3098<62530] 8707>5047 MED=3365 OK2VAL(0)=0
+12:11:48.576 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:49.200 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:49.274 - OK2 OK RKK=000 [5123<58572 - 5403<57933 - 4676<57534] 7953>4701 MED=3134 OK2VAL(0)=0
+12:11:52.374 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:54.041 - OK2 OK RKK=000 [10633<50138 - 9960<50059 - 10558<51716] 5805>2787 MED=1858 OK2VAL(0)=0
+12:11:55.157 - OK2 OK RKK=000 [11231<60139 - 10710<59906 - 10979<58834] 6638>3282 MED=2188 OK2VAL(0)=0
+12:11:59.130 - OK2 OK RKK=000 [7304<57475 - 6378<56610 - 6779<54683] 3671>2547 MED=1698 OK2VAL(0)=0
+12:11:59.218 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:11:59.597 - OK2 OK RKK=000 [11131<40791 - 11128<39836 - 10490<41147] 3097>2164 MED=1443 OK2VAL(0)=0
+12:12:00.152 - OK2 OK RKK=000 [7196<45358 - 7002<45191 - 6699<45350] 2902>2313 MED=1542 OK2VAL(0)=0
+12:12:03.545 - OK2 OK RKK=000 [4112<26146 - 4041<26514 - 5148<26968] 1527>1470 MED=980 OK2VAL(0)=0
+12:12:03.844 - OK2 OK RKK=000 [6232<22906 - 5997<22931 - 5625<23477] 1800>1614 MED=1076 OK2VAL(0)=0
+12:12:04.652 - OK2 OK RKK=000 [7965<23333 - 4554<22486 - 5482<23362] 1298>1234 MED=823 OK2VAL(0)=0
+12:12:04.821 - OK2 OK RKK=000 [3263<20020 - 4710<19891 - 2967<19635] 2969>2512 MED=1675 OK2VAL(0)=0
+12:12:05.059 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:12:05.301 - OK2 OK RKK=000 [3476<22004 - 3114<21642 - 3474<21645] 3396>2574 MED=1716 OK2VAL(0)=0
+12:12:05.375 - OK1 OK RKK=110 REGN=46008 OK1VAL(6)=6
+12:12:08.253 - OK1 OK RKK=110 REGN=02008 OK1VAL(6)=6
+12:12:13.588 - OK2 OK RKK=000 [2098<8295 - 1738<7996 - 3476<8301] 2415>1062 MED=708 OK2VAL(0)=0
+13:48:43.633 - OK2 OK RKK=000 [869<3412 - 1229<3474 - 720<3623] 509>436 MED=291 OK2VAL(0)=0
+14:25:49.619 - OK2 OK RKK=000 [1440<3474 - 720<3836 - 509<3389] 509>462 MED=308 OK2VAL(0)=0
+*/
 
 
 uint decodePOS(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
@@ -1353,19 +1391,12 @@ for (i = pkkoffs; i < pkkend; i++) {
 pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
 pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-// p1 = decodePOS(m, pkkoffs,    pkkpulselevel);
-// p2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
-// p3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
-// p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
-// p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
-// p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
-
-p1 = (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-p2 = (uint32_t) (m[pkkoffs+8]+m[pkkoffs+9]+m[pkkoffs+10]+m[pkkoffs+11]+m[pkkoffs+12]+m[pkkoffs+13]+m[pkkoffs+14]+m[pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-p3 = (uint32_t) (m[pkkoffs+16]+m[pkkoffs+17]+m[pkkoffs+18]+m[pkkoffs+19]+m[pkkoffs+20]+m[pkkoffs+21]+m[pkkoffs+22]+m[pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-p4 = (uint32_t) (m[pkkoffs+24]+m[pkkoffs+25]+m[pkkoffs+26]+m[pkkoffs+27]+m[pkkoffs+28]+m[pkkoffs+29]+m[pkkoffs+30]+m[pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-p5 = (uint32_t) (m[pkkoffs+32]+m[pkkoffs+33]+m[pkkoffs+34]+m[pkkoffs+35]+m[pkkoffs+36]+m[pkkoffs+37]+m[pkkoffs+38]+m[pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-p6 = (uint32_t) (m[pkkoffs+40]+m[pkkoffs+41]+m[pkkoffs+42]+m[pkkoffs+43]+m[pkkoffs+44]+m[pkkoffs+45]+m[pkkoffs+46]+m[pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
+p1 = decodePOS(m, pkkoffs,    pkkpulselevel);
+p2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
+p3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
+p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
+p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
+p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
 
 result = 0;
 result = ((p1 < p2) ? 0 : 4) | ((p3 < p4) ? 0 : 2) | ((p5 < p6) ? 0 : 1);
@@ -1388,14 +1419,14 @@ for (i = pkkoffs; i < pkkend; i++) {
 pkkmediana = pkkmediana / UVD_DECADE_LEN;     
 pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-b1 = (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-b2 = (uint32_t) (m[pkkoffs+8]+m[pkkoffs+9]+m[pkkoffs+10]+m[pkkoffs+11]+m[pkkoffs+12]+m[pkkoffs+13]+m[pkkoffs+14]+m[pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-b3 = (uint32_t) (m[pkkoffs+16]+m[pkkoffs+17]+m[pkkoffs+18]+m[pkkoffs+19]+m[pkkoffs+20]+m[pkkoffs+21]+m[pkkoffs+22]+m[pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-b4 = (uint32_t) (m[pkkoffs+24]+m[pkkoffs+25]+m[pkkoffs+26]+m[pkkoffs+27]+m[pkkoffs+28]+m[pkkoffs+29]+m[pkkoffs+30]+m[pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-b5 = (uint32_t) (m[pkkoffs+32]+m[pkkoffs+33]+m[pkkoffs+34]+m[pkkoffs+35]+m[pkkoffs+36]+m[pkkoffs+37]+m[pkkoffs+38]+m[pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-b6 = (uint32_t) (m[pkkoffs+40]+m[pkkoffs+41]+m[pkkoffs+42]+m[pkkoffs+43]+m[pkkoffs+44]+m[pkkoffs+45]+m[pkkoffs+46]+m[pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-b7 = (uint32_t) (m[pkkoffs+48]+m[pkkoffs+49]+m[pkkoffs+50]+m[pkkoffs+51]+m[pkkoffs+52]+m[pkkoffs+53]+m[pkkoffs+54]+m[pkkoffs+55])/8 > pkkpulselevel ? 1 : 0;
-b8 = (uint32_t) (m[pkkoffs+56]+m[pkkoffs+57]+m[pkkoffs+58]+m[pkkoffs+59]+m[pkkoffs+60]+m[pkkoffs+61]+m[pkkoffs+62]+m[pkkoffs+63])/8 > pkkpulselevel ? 1 : 0;
+b1 = decodePOS(m, pkkoffs,    pkkpulselevel);
+b2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
+b3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
+b4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
+b5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
+b6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
+b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
+b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 
 result = 0;
 result = (b1 < b2) ? 0 : 8 | (b3 < b4) ? 0 : 4 | (b5 < b6) ? 0 : 2 | (b7 < b8) ? 0 : 1;
@@ -1493,6 +1524,19 @@ uint okval;
 // time_t t;
 // uint32_t hashval;
 // time_t now = time(NULL);
+    uint16_t marrwrite[UVD_MAX_LEN];
+
+    printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
+    printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
+    FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
+    //fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
+    // fread(clientdata, sizeof(char), sizeof(clientdata), ifp);
+    fread(marrwrite, sizeof(uint16_t), sizeof(marrwrite), ifp);
+    fclose(ifp);
+
+    for(i=0;i<UVD_MAX_LEN;i++) {
+    m[i]=marrwrite[i];
+    }
 
 //сканирование буффера длиной mlen
 for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
@@ -1532,13 +1576,12 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
 
 
-    char timestr[20];
+    char timestr[20], filestr[20];
     struct timeval tp;
     gettimeofday(&tp, 0);
     time_t curtime = tp.tv_sec;
     struct tm *t = localtime(&curtime);
     sprintf(timestr, "%02d:%02d:%02d.%03d", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
-
     // regnumber[0] = (char) (int) '0'; //+1);
     // printf("regnumber=%c",regnumber[0]);
 
@@ -1643,35 +1686,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
     ---РКИ3 =0   
     -----POS1 =0 SUMM(82-89)<SUMM(90-97)                
     */      
-/*
 
-OK2 OK! 000 RKK 2607<2669 - 2543<2967 - 1589<2098 -- 360>297
-OK2 OK! 000 RKK 2458<3029 - 1589<1949 - 1589<2309 -- 360>324
-OK2 OK! 000 RKK 1949<2880 - 1589<2160 - 3710<3743 -- 360>311
-OK2 OK! 000 RKK 1589<2754 - 1949<2034 - 1949<2309 -- 805>386
-OK2 OK! 000 RKK 1440<2756 - 1949<2458 - 1738<2818 -- 805>297
-OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
-
-23:47:13:287 - OK2 OK! 000 RKK 720<3327 - 720<3178 - 1589<3178 -- 360>396 -- MED                                                                                                             =264
-23:57:01:042 - OK2 OK! 000 RKK 720<2669 - 360<2754 - 869<2967 -- 360>322 -- MED=                                                                                                             215
-00:05:40:506 - OK2 OK! 000 RKK 1229<2754 - 360<2818 - 720<2818 -- 360>333 -- MED                                                                                                             =222
-00:06:32:597 - OK2 OK! 000 RKK 1018<3029 - 1080<2839 - 360<2818 -- 509>348 -- ME                                                                                                             D=232
-00:07:26:478 - OK2 OK! 000 RKK 720<2458 - 869<2520 - 720<2458 -- 360>304 -- MED=                                                                                                             203
-00:22:22:707 - OK2 OK! 000 RKK 360<2458 - 360<2458 - 1440<2756 -- 509>306 -- MED                                                                                                             =204
-00:30:12:217 - OK2 OK! 000 RKK 360<2458 - 720<2458 - 720<2309 -- 509>282 -- MED=                                                                                                             188
-00:39:04:983 - OK2 OK! 000 RKK 720<2669 - 360<2607 - 720<2669 -- 509>304 -- MED=                                                                                                             203
-00:43:05:874 - OK2 OK! 000 RKK 869<3116 - 720<2967 - 1080<3029 -- 360>367 -- MED                                                                                                             =245
-00:57:44:362 - OK2 OK! 000 RKK 0<2098 - 720<2098 - 720<2669 -- 360>259 -- MED=17                                                                                                             3
-00:58:25:952 - OK2 OK! 000 RKK 360<2396 - 360<2309 - 1080<2309 -- 360>274 -- MED                                                                                                             =183
-01:03:36:985 - OK2 OK! 000 RKK 360<2458 - 869<2458 - 1080<2520 -- 509>304 -- MED                                                                                                             =203
-01:07:03:207 - OK2 OK! 000 RKK 360<2669 - 0<2309 - 360<2669 -- 509>261 -- MED=17                                                                                                             4
-01:16:19:892 - OK2 OK! 000 RKK 1949<2669 - 0<2967 - 360<2669 -- 360>331 -- MED=2                                                                                                             21
-01:22:16:934 - OK2 OK! 000 RKK 720<2309 - 360<2309 - 869<2458 -- 509>282 -- MED=                                                                                                             188
-01:26:39:600 - OK2 OK! 000 RKK 509<2458 - 720<2309 - 720<2309 -- 360>282 -- MED=                                                                                                             188
-01:29:41:156 - OK2 OK! 000 RKK 0<2818 - 1080<2756 - 1080<3265 -- 509>343 -- MED=                                                                                                             229
-01:39:53:281 - OK2 OK! 000 RKK 360<2669 - 720<2669 - 1440<2669 -- 360>328 -- MED                                                                                                             =219
-
-*/ 
 
         //определение среднего значения в ряде периодов для выделения посылки над помехами
         pkkmediana = 0;
@@ -1714,7 +1729,20 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
                 // 6 - OK1, 0 - OK2, 5 - OK3
                 okval
                 );
-            j+=UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
+
+            
+
+            for(i=0;i<UVD_MAX_LEN;i++) {
+            marrwrite[i] = m[j+i];
+            }
+
+            sprintf(filestr, "ok2-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
+            FILE *f = fopen(filestr, "wb");
+            fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
+            fclose(f);
+
+
+            j+=UVD_KOORD_KODE_LEN+UVD_OK2_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
             continue;
         } 
             // else printf("%s - OK2 BAD RKK\n", timestr);
@@ -2015,6 +2043,17 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
             //     );
             printf("%s - OK1 OK RKK=110 REGN=%c%c%c%c%c OK1VAL(6)=%d\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1, okval);
 
+
+            // for(i=0;i<UVD_MAX_LEN;i++) {
+            // marrwrite[i] = m[j+i];
+            // }
+
+            // sprintf(filestr, "ok1-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
+            // FILE *f = fopen(filestr, "wb");
+            // fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
+            // fclose(f);
+
+
             j+=UVD_KOORD_KODE_LEN+UVD_OK1_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
             continue;
         } 
@@ -2142,6 +2181,17 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
         
         okval = decodeKEY(m, j+pkkoffs); // 6 - OK1, 0 - OK2, 5 - OK3
 
+
+            for(i=0;i<UVD_MAX_LEN;i++) {
+            marrwrite[i] = m[j+i];
+            }
+
+            sprintf(filestr, "ok3-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
+            FILE *f = fopen(filestr, "wb");
+            fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
+            fclose(f);
+
+
             printf("%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d OK3VAL(5)=%d MED=%d\n",
                 timestr,
                 m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
@@ -2155,7 +2205,8 @@ OK2 OK! 000 RKK 1949<2309 - 1949<2607 - 1738<3412 -- 360>289
                 okval,
                 mediana
                 );
-            j+=UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
+
+            j+=UVD_KOORD_KODE_LEN+UVD_OK3_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
             continue;
         }
             // else printf("OK3 BAD RKK\n");          
