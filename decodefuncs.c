@@ -55,8 +55,8 @@ p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
 
         if( //110 OK1
             p1>p2 &&    //10
-            p3>p4 &&    //01
-            p5<p6       //10
+            p3>p4 &&    //10
+            p5<p6       //01
           ) return 6; else
 
         return -1;

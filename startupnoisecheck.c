@@ -19,17 +19,16 @@ levels[i] = 0;
 maxsignal = 0;
 // minsignal = 0;
 
-//сканирование буффера длиной mlen
+//сканирование буффера длиной mlen, смотрим каждый 100-ый элемент для ускорения
 for (noise = 0; noise < mlen; noise+=100) {
 if(maxsignal<m[noise]) maxsignal = m[noise];
 // if(minsignal>m[noise]) minsignal = m[noise];
 } //end for
 
-// printf("\nMax Signal=%d  Min Signal=%d\n\n", maxsignal, minsignal );
-
+//насколько разбиваем уровень сигнала
 delta = maxsignal / deltares;
 
-//сканирование буффера длиной mlen
+//сканирование буффера длиной mlen, смотрим каждый 100-ый элемент для ускорения
 for (noise = 0; noise < mlen; noise+=100) {
 
 for (i = 0; i< deltares; i++)
@@ -42,6 +41,8 @@ for (i = 0; i< deltares; i++)
 noiselevel = 0;
 for (i = 0; i < (deltares-1); i++)
 {
+	//разница в количесвте шумов более чем 3 раза считаем за порог шума
+	//ставим уровень на пару delta выше
 	if( levels[i] > (levels[i+1]*3) ) { noiselevel = delta*(i+2); break; }
 }
 
