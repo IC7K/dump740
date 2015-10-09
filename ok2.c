@@ -124,27 +124,27 @@
         pkkpulselevel = pulselevel;
 
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec1==-1) continue; //11 или 00 вместо 10 или 01
+        if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec2==-1) continue; //11 или 00 вместо 10 или 01
+        if(dec2 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec3==-1) continue; //11 или 00 вместо 10 или 01
+        if(dec3 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec4==-1) continue; //11 или 00 вместо 10 или 01
+        if(dec4 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec5 = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
-        // if(dec5==-1) continue; //11 или 00 вместо 10 или 01
+        if(dec5 == -1) continue; //11 или 00 вместо 10 или 01
 
         int fuel = (dec5<10) ? dec5*5 : (dec5-5)*10;
 
