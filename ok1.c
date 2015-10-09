@@ -1,11 +1,6 @@
     //******************* OK1 **********************
 
-    if((uint32_t) ((m[j+27]+m[j+28]+m[j+29])/3)>pulselevel) {       
-
-    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
-    createOK1 (ok1koord, UVD_KOORD_KODE_LEN);
-    oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
-    
+    if((uint32_t) ((m[j+27]+m[j+28]+m[j+29])/3)>pulselevel) {          
     //OK1
     //t=8.5mks 110
     /*
@@ -111,6 +106,13 @@
 
         if(okval==6)
         {
+
+    printf("+++++++++ PROCESSING OK1 CODE +++++++++\n");
+    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
+    createOK1 (ok1koord, UVD_KOORD_KODE_LEN);
+    oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
+    printf("+++++++++++++++++++++++++++++++++++++++\n");
+
         //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
 
         //START DECADE 1 - bits for positions

@@ -2,10 +2,11 @@ void oscilloscope(uint16_t *m, uint32_t pkkoffs,  uint32_t osclen, uint32_t pkkp
 uint i, j;
 uint32_t maxsignal, delta;
 uint deltares = 10; //10 уровней анализа
+uint pulselevel;
 
 maxsignal = 0;
 
-pkkpulselevel = 0;
+
 //сканирование буффера длиной mlen, смотрим каждый 100-ый элемент для ускорения
 for (i = 0; i < osclen; i++) {
 if(maxsignal<m[i]) maxsignal = m[i];
@@ -15,12 +16,17 @@ if(maxsignal<m[i]) maxsignal = m[i];
 //насколько разбиваем уровень сигнала
 delta = maxsignal / deltares;
 
+if(delta==0) delta=1;
+
+pulselevel = pkkpulselevel/delta;
+
 printf("\n");
 
 for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
 {
 	//сканирование буффера длиной osclen
 	for (j = 0; j < osclen; j++) {
+		if( j<3 && (i == pulselevel) ) printf("-"); else
 		if( (delta*i) < m[pkkoffs+j] ) printf("*"); else printf(" ");
 	} // end for j
 	printf("\n");

@@ -3,11 +3,6 @@
     if((uint32_t) ((m[j+21]+m[j+22]+m[j+23])/3)>pulselevel) {
     //OK2
     //t=14mks 000
-
-    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
-    createOK1 (ok2koord, UVD_KOORD_KODE_LEN);
-    oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
-
     /*
     [23]  т=0,5 мкс       
     [24]  т=1 мкс       
@@ -124,6 +119,12 @@
 
         if(okval == 0)
         {
+    printf("+++++++++ PROCESSING OK2 CODE +++++++++\n");
+    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
+    createOK1 (ok2koord, UVD_KOORD_KODE_LEN);
+    oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
+    printf("+++++++++++++++++++++++++++++++++++++++\n");
+
 
         pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
         pkkpulselevel = pulselevel;
