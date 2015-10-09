@@ -61,24 +61,24 @@
 #define MODES_LONG_MSG_BITS 112
 #define MODES_SHORT_MSG_BITS 56
 
-#define UVD_MSG_RAZR 40      //40 разрядов в сообщении
-#define UVD_MSG_DECADE_RAZR 4    //4 разряда на декаду
-#define UVD_MSG_POS 4    //4 разряда на декаду
 
-#define UVD_KOORD_KODE_LEN 45    //45 периодов по 0,5 мкс - длина анализа координатного кода
-#define UVD_KEY_KODE_LEN 48      //48 периодов по 0,5 мкс - длина анализа ключевого кода 
-#define UVD_INFO_KODE_LEN 640    //64*5=320 *2=640(с повтором) периодов по 0,5 мкс - длина анализа информационной части 
-#define UVD_OK1_DELAY 17         //8.5mks бортовой номер
-#define UVD_OK2_DELAY 28          //14mks высота топливо
-#define UVD_OK3_DELAY 20          //10mks скорость
-#define UVD_OK1_OFFS 45          //8.5mks бортовой номер
-#define UVD_OK2_OFFS 50          //14mks высота топливо
-#define UVD_OK3_OFFS 57          //10mks скорость
-#define UVD_DECADE_LEN 64         //64 periods by 0.5mks
+#define UVD_KOORD_KODE_LEN      45    //45 периодов по 0,5 мкс - длина анализа координатного кода
+#define UVD_KEY_KODE_LEN        48    //48 периодов по 0,5 мкс - длина анализа ключевого кода 
+#define UVD_INFO_KODE_LEN       640   //64*5=320 *2=640(с повтором) периодов по 0,5 мкс - длина анализа информационной части 
 
+#define UVD_OK1_START           28    //14mks бортовой номер
+#define UVD_OK2_START           22    //11mks высота топливо
+#define UVD_OK3_START           36    //18mks скорость
 
-#define UVD_RESPONSE_LEN UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN //общая длинна ответа 
+#define UVD_OK1_DELAY           17    //8.5mks бортовой номер
+#define UVD_OK2_DELAY           28    //14mks высота топливо
+#define UVD_OK3_DELAY           20    //10mks скорость
 
+#define UVD_OK1_OFFS            UVD_OK1_START+UVD_OK1_DELAY //28+17=45    //8.5mks бортовой номер
+#define UVD_OK2_OFFS            UVD_OK2_START+UVD_OK2_DELAY //22+28=50    //14mks высота топливо
+#define UVD_OK3_OFFS            UVD_OK3_START+UVD_OK3_DELAY //36+20=56    //10mks скорость
+
+#define UVD_DECADE_LEN          64    //64 periods by 0.5mks
 
 #define UVD_MAX_LEN             UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_OK2_DELAY+UVD_INFO_KODE_LEN
 
@@ -1544,140 +1544,6 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 } //end proc
 
 
-<<<<<<< HEAD
-=======
-    if((uint32_t) ((m[j+36]+m[j+37]+m[j+38])/3)>pulselevel) {         
-    //OK3
-    //t=10mks 101
-    /*
-    [38]  т=0,5 мкс       
-    [39]  т=1 мкс       
-    [40]  т=1,5 мкс               
-    [41]  т=2 мкс       
-    [42]  т=2,5 мкс       
-    [43]  т=3 мкс   
-    [44]  т=3,5 мкс       
-    [45]  т=4 мкс       
-    [46]  т=4,5 мкс
-    [47]  т=5 мкс       
-    [48]  т=5.5 мкс       
-    [49]  т=6 мкс               
-    [50]  т=6.5 мкс       
-    [51]  т=7 мкс       
-    [52]  т=7.5 мкс   
-    [53]  т=8 мкс       
-    [54]  т=8.5 мкс       
-    [55]  т=9 мкс          
-    [56]  т=9.5 мкс               
-
-
-    ---РКИ1 =1
-    -----POS1 =1 SUMM(57-64)>SUMM(65-72)
-    [57]  т=14 мкс     t=0 mks
-    [58]  т=14.5 мкс   t=0.5 mks       
-    [59]  т=15 мкс     t=1 mks  
-    [60]  т=15,5 мкс   t=1.5 mks  
-    [61]  т=16 мкс     t=2 mks
-    [62]  т=16,5 мкс   t=2.5 mks
-    [63]  т=17 мкс     t=3 mks
-    [64]  т=17,5 мкс   t=3.5 mks
-    -----POS2 =0   
-    [65]  т=18 мкс     t=4mks   t=0 mks
-    [66]  т=18.5 мкс   t=4.5mks t=0.5 mks       
-    [67]  т=19 мкс     t=5mks   t=1 mks  
-    [68]  т=19,5 мкс   t=5.5mks t=1.5 mks  
-    [69]  т=20 мкс     t=6mks   t=2 mks
-    [70]  т=20,5 мкс   t=6.5mks t=2.5 mks
-    [71]  т=21 мкс     t=7mks   t=3 mks
-    [72]  т=21,5 мкс   t=7.5mks t=3.5 mks
-
-    ---РКИ2 =0   
-    -----POS1 =0 SUMM(73-80)<SUMM(81-88)
-    [73]  т=14 мкс     t=0 mks
-    [74]  т=14.5 мкс   t=0.5 mks       
-    [75]  т=15 мкс     t=1 mks  
-    [76]  т=15,5 мкс   t=1.5 mks  
-    [77]  т=16 мкс     t=2 mks
-    [78]  т=16,5 мкс   t=2.5 mks
-    [79]  т=17 мкс     t=3 mks
-    [80]  т=17,5 мкс   t=3.5 mks
-    -----POS2 =1   
-    [81]  т=18 мкс     t=4mks   t=0 mks
-    [82]  т=18.5 мкс   t=4.5mks t=0.5 mks       
-    [83]  т=19 мкс     t=5mks   t=1 mks  
-    [84]  т=19,5 мкс   t=5.5mks t=1.5 mks  
-    [85]  т=20 мкс     t=6mks   t=2 mks
-    [86]  т=20,5 мкс   t=6.5mks t=2.5 mks
-    [87]  т=21 мкс     t=7mks   t=3 mks
-    [88]  т=21,5 мкс   t=7.5mks t=3.5 mks
-
-    ---РКИ3 =1   
-    -----POS1 =1 SUMM(89-96)>SUMM(97-104)
-    [89]  т=14 мкс     t=0 mks
-    [90]  т=14.5 мкс   t=0.5 mks       
-    [91]  т=15 мкс     t=1 mks  
-    [92]  т=15,5 мкс   t=1.5 mks  
-    [93]  т=16 мкс     t=2 mks
-    [94]  т=16,5 мкс   t=2.5 mks
-    [95]  т=17 мкс     t=3 mks
-    [96]  т=17,5 мкс   t=3.5 mks
-    -----POS2 =0
-    [97]  т=18 мкс     t=4mks   t=0 mks
-    [98]  т=18.5 мкс   t=4.5mks t=0.5 mks       
-    [99]  т=19 мкс     t=5mks   t=1 mks  
-    100]  т=19,5 мкс   t=5.5mks t=1.5 mks  
-    101]  т=20 мкс     t=6mks   t=2 mks
-    102]  т=20,5 мкс   t=6.5mks t=2.5 mks
-    103]  т=21 мкс     t=7mks   t=3 mks
-    104]  т=21,5 мкс   t=7.5mks t=3.5 mks    
-
-    ---РКИ1 =1
-    -----POS1 =1 SUMM(57-64)>SUMM(65-72)
-    ---РКИ2 =0   
-    -----POS1 =0 SUMM(73-80)<SUMM(81-88)
-    ---РКИ3 =1   
-    -----POS1 =1 SUMM(89-96)>SUMM(97-104)                      
-    */
-                    //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
-        pkkoffs = UVD_OK3_OFFS; //57
-        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=104
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
-
-        p1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
-        p2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
-        p3 = (uint32_t) (m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23])/8 > pkkpulselevel ? 1 : 0;
-        p4 = (uint32_t) (m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31])/8 > pkkpulselevel ? 1 : 0;
-        p5 = (uint32_t) (m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39])/8 > pkkpulselevel ? 1 : 0;
-        p6 = (uint32_t) (m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47])/8 > pkkpulselevel ? 1 : 0;
-
-        if( //101
-            p1>p2 &&    //10
-            p3<p4 &&    //01
-            p5>p6       //10
-          ) 
-        {
-            printf("%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d MED=%d\n",
-                timestr,
-                m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
-                m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
-                m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
-                m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
-                m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
-                m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
-                m[j],
-                pulselevel,
-                mediana
-                );
-            j+=UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
-            continue;
-        }
-            // else printf("OK3 BAD RKK\n");          
->>>>>>> parent of 9f26dde... correct OK3
 
 
 
