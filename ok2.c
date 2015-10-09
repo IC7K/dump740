@@ -103,16 +103,17 @@
 
 
         //определение среднего значения в ряде периодов для выделения посылки над помехами
-        // pkkmediana = 0;
         pkkoffs = UVD_OK2_OFFS; //50
-        // pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=97
-        // for (i = pkkoffs; i < pkkend; i++) { 
-        //     pkkmediana+=m[j+i]; //SUMM(ALL)
-        // }    
-        // pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
-        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        // pkkpulselevel = pulselevel;
+        
+        pkkmediana = 0;
+        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=97
+        for (i = pkkoffs; i < pkkend; i++) { 
+            pkkmediana+=m[j+i]; //SUMM(ALL)
+        }    
+        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+        pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-        pkkpulselevel = pulselevel;
         //декодирование ключевого кода
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3, -1 - ERROR
 
@@ -123,31 +124,31 @@
         pkkpulselevel = pulselevel;
 
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec1==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec1==-1) continue; //11 или 00 вместо 10 или 01
         dec1+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec2==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec2==-1) continue; //11 или 00 вместо 10 или 01
         dec2+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec3==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec3==-1) continue; //11 или 00 вместо 10 или 01
         dec3+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec4==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec4==-1) continue; //11 или 00 вместо 10 или 01
         dec4+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec5 = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
-        if(dec5==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec5==-1) continue; //11 или 00 вместо 10 или 01
 
         int fuel = (dec5<10) ? dec5*5 : (dec5-5)*10;
 
@@ -156,38 +157,38 @@
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec1r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec1r==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec1r==-1) continue; //11 или 00 вместо 10 или 01
         dec1r+=(int) '0';
-        if(dec1r!=dec1) continue; 
+        // if(dec1r!=dec1) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec2r==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec2r==-1) continue; //11 или 00 вместо 10 или 01
         dec2r+=(int) '0';
-        if(dec2r!=dec2) continue; 
+        // if(dec2r!=dec2) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec3r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec3r==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec3r==-1) continue; //11 или 00 вместо 10 или 01
         dec3r+=(int) '0';
-        if(dec3r!=dec3) continue; 
+        // if(dec3r!=dec3) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec4r==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec4r==-1) continue; //11 или 00 вместо 10 или 01
         dec4r+=(int) '0';
-        if(dec4r!=dec4) continue; 
+        // if(dec4r!=dec4) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec5r = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
-        if(dec5r==-1) continue; //11 или 00 вместо 10 или 01
-        if(dec5r!=dec5) continue; 
+        // if(dec5r==-1) continue; //11 или 00 вместо 10 или 01
+        // if(dec5r!=dec5) continue; 
 
-        // int fuelr = (dec5r<10) ? dec5r*5 : (dec5r-5)*10;
+        int fuelr = (dec5r<10) ? dec5r*5 : (dec5r-5)*10;
 
         //Print result
             // printf("%s - OK2 OK RKK=000 [%d<%d - %d<%d - %d<%d] %d>%d MED=%d OK2VAL(0)=%d\n",
@@ -206,7 +207,7 @@
             //     );
 
         printf("%s - OK2 OK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, fuel);            
-
+        printf("%s - OK2rOK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4r)>>2, (char) dec3r, (char) dec2r, (char) dec1r, fuelr); 
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];
             // }

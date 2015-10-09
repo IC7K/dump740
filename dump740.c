@@ -82,6 +82,8 @@
 
 #define UVD_MAX_LEN             UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_OK2_DELAY+UVD_INFO_KODE_LEN
 
+uint32_t noiselevel = 0;        //уровень шума
+
 //выделение кода из сигнала происходит в процедуре detectUVD 
 
 #define MODES_FULL_LEN (MODES_PREAMBLE_US+MODES_LONG_MSG_BITS)
@@ -1338,7 +1340,7 @@ void applyPhaseCorrection(uint16_t *m) {
 
 #include </home/pi/dump740/decodefuncs.c>
 
-
+#include </home/pi/dump740/startupnoisecheck.c>
 // uint testFUNC(uint16_t *m, uint32_t j) {
 //     return m[j];
 // }
@@ -1419,14 +1421,14 @@ void detectUVD(uint16_t *m, uint32_t mlen) {
 */
 //UVD_KOORD_KODE_LEN
 
-uint32_t mediana, pulselevel, pkkmediana, pkkpulselevel;
+uint32_t pulselevel, pkkmediana, pkkpulselevel;
 // uint32_t b1, b2, b3, b4, b5, b6, b7, b8;
 uint32_t p1, p2, p3, p4, p5, p6;
 int dec1, dec2, dec3, dec4, dec5;
 int dec1r, dec2r, dec3r, dec4r, dec5r;
 uint32_t i, j, pkkoffs, pkkend;
 uint okval;
-uint windowlen;
+// uint windowlen;
 // char regnumber[6];
 // time_t t;
 // uint32_t hashval;
@@ -1466,6 +1468,11 @@ uint windowlen;
   //   // printf("%x ", m[i]);
   //   }
   //+++++++++++++++ TEST FILE LOAD ++++++++++++++++++++ 
+// pulselevel = 999999;
+
+
+
+    pulselevel = startupNOISE(m,mlen);       // Do some calculation.
 
 
 //сканирование буффера длиной mlen
@@ -1476,20 +1483,20 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
     // printf("VAL=%d FUNC=%d\n", m[j], testFUNC(m,j));
 
     //определение среднего значения в ряде периодов для выделения посылки над помехами
-    mediana = 0;
-    windowlen = UVD_KOORD_KODE_LEN;
-    for (i = 0; i < windowlen; i++) { 
-        mediana+=m[j+i]; //SUMM(ALL)
-    }  
-    mediana = mediana / windowlen;
+    // mediana = 0;
+    // windowlen = UVD_KOORD_KODE_LEN;
+    // for (i = 0; i < windowlen; i++) { 
+    //     mediana+=m[j+i]; //SUMM(ALL)
+    // }  
+    // mediana = mediana / windowlen;
 
-    pulselevel = mediana / 2 + mediana;
+    // pulselevel = mediana / 2 + mediana;
 
     // printf("MED=%d ", mediana);
     // printf("PULSE=%d ", pulselevel);
 
     //если начало не идет с импульса (PK1) то сдвигаем окно на следующий период
-    if(m[j]<pulselevel) continue;
+    if(m[j]<pulselevel) { continue; }
 
     /*
     Для передачи сообщения используется натуральный двоично-десятичный четырехразрядный код с активной паузой,
@@ -1523,7 +1530,6 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
     //******************* OK2 **********************
 
 #include </home/pi/dump740/ok2.c>
-
 
     //******************* OK3 **********************
 

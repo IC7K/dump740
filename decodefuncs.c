@@ -20,7 +20,8 @@ return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4
 // 6 - OK1, 0 - OK2, 5 - OK3
 int decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;    
-uint result, p1, p2, p3, p4, p5, p6;
+uint p1, p2, p3, p4, p5, p6;
+// uint result;
 
 //определение среднего значения в ряде периодов для выделения посылки над помехами
 // pkkmediana = 0;
@@ -38,17 +39,39 @@ p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
 p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
 p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
 
-if(p1==p2 || p3==p4 || p5==p6)
-    {
-        //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
-        result = -1;
-    }
-else
-    {
-        result = 0;
-        result = ((p1 < p2) ? 0 : 4) | ((p3 < p4) ? 0 : 2) | ((p5 < p6) ? 0 : 1);
-    }
-return result; 
+// 6 - OK1, 0 - OK2, 5 - OK3, -1 - ERROR
+
+        if( //101 OK3
+            p1>p2 &&    //10
+            p3<p4 &&    //01
+            p5>p6       //10
+          ) return 5; else
+
+        if( //000 OK2
+            p1<p2 &&    //01
+            p3<p4 &&    //01
+            p5<p6       //01
+          ) return 0; else
+
+        if( //110 OK1
+            p1>p2 &&    //10
+            p3>p4 &&    //01
+            p5<p6       //10
+          ) return 6; else
+
+        return -1;
+
+// if(p1==p2 || p3==p4 || p5==p6)
+//     {
+//         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
+//         result = -1;
+//     }
+// else
+//     {
+//         result = 0;
+//         result = ((p1 < p2) ? 0 : 4) | ((p3 < p4) ? 0 : 2) | ((p5 < p6) ? 0 : 1);
+//     }
+// return result; 
 
 } //end decodeKEY
 
@@ -81,6 +104,7 @@ b6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
 b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
 b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 // printf("  END DECADE\n");
+
 
 if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
     {

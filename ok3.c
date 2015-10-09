@@ -93,14 +93,15 @@
     -----POS1 =1 SUMM(88-95)>SUMM(96-103)                      
     */
                     //определение среднего значения в ряде периодов для выделения посылки над помехами
-        pkkmediana = 0;
+        // pkkmediana = 0;
         pkkoffs = UVD_OK3_OFFS; //56
-        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=104
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        // pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=104
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        pkkpulselevel = pulselevel;
 
         p1 = (uint32_t) (m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7])/8           > pkkpulselevel ? 1 : 0;
         p2 = (uint32_t) (m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15])/8   > pkkpulselevel ? 1 : 0;
@@ -118,18 +119,19 @@
         
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 
+            uint16_t marwrite[UVD_MAX_LEN];
 
             for(i=0;i<UVD_MAX_LEN;i++) {
-            marrwrite[i] = m[j+i];
+            marwrite[i] = m[j+i];
             }
 
             sprintf(filestr, "ok3-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
             FILE *f = fopen(filestr, "wb");
-            fwrite(marrwrite, sizeof(uint16_t), sizeof(marrwrite), f);
+            fwrite(marwrite, sizeof(uint16_t), sizeof(marwrite), f);
             fclose(f);
 
 
-            printf("%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d OK3VAL(5)=%d MED=%d\n",
+            printf("%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d OK3VAL(5)=%d\n",
                 timestr,
                 m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
                 m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
@@ -139,8 +141,8 @@
                 m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
                 m[j],
                 pulselevel,
-                okval,
-                mediana
+                okval
+                // mediana
                 );
 
             j+=UVD_KOORD_KODE_LEN+UVD_OK3_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
