@@ -28,11 +28,12 @@ for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
 	for (j = 0; j < osclen; j++) {
 		if( (delta*i) < m[pkkoffs+j] ) if( i == pulselevel ) printf("-"); else if (ideal[j] != 0) printf("+"); else printf("*"); else printf(" ");
 	} // end for j
-	
-	for (j = 0; j < osclen; j++) printf("_");
 	printf("\n");
 
 } //end for i
+
+	for (j = 0; j < osclen; j++) printf("_");
+	printf("\n");
 
 }
 
