@@ -113,7 +113,7 @@
     oscilloscope(m, ok1koord, j,  UVD_KOORD_KODE_LEN, pulselevel);
     
     // oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
-    printf("_______________________________________\n");
+
 
         //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
 

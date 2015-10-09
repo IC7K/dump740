@@ -122,7 +122,7 @@
     oscilloscope(m, ok3koord, j,  UVD_KOORD_KODE_LEN, pulselevel);
 
     // oscilloscope(ok3koord, 0,  UVD_KOORD_KODE_LEN, pulselevel);             
-    printf("_______________________________________\n");
+
 
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 
