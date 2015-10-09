@@ -91,15 +91,15 @@
     */     
         //определение среднего значения в ряде периодов для выделения посылки над помехами
         pkkoffs = UVD_OK1_OFFS; //45
-        // pkkpulselevel = pulselevel;
+        pkkpulselevel = pulselevel;
 
-        pkkmediana = 0;
-        pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=93
-        for (i = pkkoffs; i < pkkend; i++) { 
-            pkkmediana+=m[j+i]; //SUMM(ALL)
-        }    
-        pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
-        pkkpulselevel = pkkmediana / 2 + pkkmediana;
+        // pkkmediana = 0;
+        // pkkend = pkkoffs + UVD_KEY_KODE_LEN; //+48=93
+        // for (i = pkkoffs; i < pkkend; i++) { 
+        //     pkkmediana+=m[j+i]; //SUMM(ALL)
+        // }    
+        // pkkmediana = pkkmediana / UVD_KEY_KODE_LEN;     //48 периодов 0,5мкс в коде
+        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
         //декодирование ключевого кода
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3, -1 - ERROR
@@ -111,81 +111,48 @@
         //START DECADE 1 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
-        //определение среднего значения в ряде периодов для выделения посылки над помехами
-        // pkkmediana = 0;
-        // pkkend = pkkoffs + UVD_DECADE_LEN;
-        // for (i = pkkoffs; i < pkkend; i++) { 
-        //     pkkmediana+=m[j+i]; //SUMM(ALL)
-        // }    
-        // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
-
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec1==-1) continue; //11 или 00 вместо 10 или 01
         dec1+=(int) '0';
         //END DECADE 1
 
+
+
         //START DECADE 2 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-        //определение среднего значения в ряде периодов для выделения посылки над помехами
-        // pkkmediana = 0;
-        // pkkend = pkkoffs + UVD_DECADE_LEN;
-        // for (i = pkkoffs; i < pkkend; i++) { 
-        //     pkkmediana+=m[j+i]; //SUMM(ALL)
-        // }    
-        // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
+
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec2==-1) continue; //11 или 00 вместо 10 или 01
         dec2+=(int) '0';
         //END DECADE 2
 
+
+
         //START DECADE 3 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-        //определение среднего значения в ряде периодов для выделения посылки над помехами
-        // pkkmediana = 0;
-        // pkkend = pkkoffs + UVD_DECADE_LEN;
-        // for (i = pkkoffs; i < pkkend; i++) { 
-        //     pkkmediana+=m[j+i]; //SUMM(ALL)
-        // }    
-        // pkkmediana = pkkmediana / UVD_DECADE_LEN;    
-        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
-
         dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec3==-1) continue; //11 или 00 вместо 10 или 01
         dec3+=(int) '0';
         //END DECADE 3
 
+        
+
         //START DECADE 4 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-        // //определение среднего значения в ряде периодов для выделения посылки над помехами
-        // pkkmediana = 0;
-        // pkkend = pkkoffs + UVD_DECADE_LEN;
-        // for (i = pkkoffs; i < pkkend; i++) { 
-        //     pkkmediana+=m[j+i]; //SUMM(ALL)
-        // }    
-        // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
         dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec4==-1) continue; //11 или 00 вместо 10 или 01
         dec4+=(int) '0';
         //END DECADE 4
 
+
+
         //START DECADE 5 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-        //определение среднего значения в ряде периодов для выделения посылки над помехами
-        // pkkmediana = 0;
-        // pkkend = pkkoffs + UVD_DECADE_LEN;
-        // for (i = pkkoffs; i < pkkend; i++) { 
-        //     pkkmediana+=m[j+i]; //SUMM(ALL)
-        // }    
-        // pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-        // pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
         dec5 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec5==-1) continue; //11 или 00 вместо 10 или 01
