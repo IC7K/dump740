@@ -258,8 +258,8 @@
             //     pulselevel,
             //     mediana
             //     );
-            printf("%s - OK1 OK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1);
-            printf("%s - OK1rOK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5r, (char) dec4r, (char) dec3r, (char) dec2r, (char) dec1r);
+            printf("\n%s - OK1 OK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1);
+            printf("\n%s - OK1rOK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5r, (char) dec4r, (char) dec3r, (char) dec2r, (char) dec1r);
 
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];

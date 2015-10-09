@@ -206,8 +206,8 @@
             //     okval
             //     );
 
-        printf("%s - OK2 OK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, fuel);            
-        printf("%s - OK2rOK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4r)>>2, (char) dec3r, (char) dec2r, (char) dec1r, fuelr); 
+        printf("\n%s - OK2 OK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, fuel);            
+        printf("\n%s - OK2rOK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4r)>>2, (char) dec3r, (char) dec2r, (char) dec1r, fuelr); 
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];
             // }

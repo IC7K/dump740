@@ -1471,6 +1471,8 @@ uint okval;
 // pulselevel = 999999;
 
 
+    // printf ("binary: %d\n",0^~8);
+
 
     pulselevel = startupNOISE(m,mlen);       // Do some calculation.
 

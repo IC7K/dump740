@@ -5,6 +5,11 @@ return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4
 
 } //end decodePOS
 
+uint32_t decodePOSRAW(uint16_t *m, uint32_t pkkoffs) {
+
+return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7]); 
+
+} //end decodePOS
 // uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 
 // // printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
@@ -20,7 +25,7 @@ return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4
 // 6 - OK1, 0 - OK2, 5 - OK3
 int decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;    
-uint p1, p2, p3, p4, p5, p6;
+uint32_t p1, p2, p3, p4, p5, p6;
 // uint result;
 
 //определение среднего значения в ряде периодов для выделения посылки над помехами
@@ -38,6 +43,11 @@ p3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
 p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
 p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
 p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
+
+//если по уровням пришло оба 11 или 00 то сравниваем тупо сумму значений периодов без учета уровня 1
+// if(p1==p2) {p1 = decodePOSRAW(m, pkkoffs); 	  p2 = decodePOSRAW(m, pkkoffs+ 8);}
+// if(p3==p4) {p3 = decodePOSRAW(m, pkkoffs+16); p4 = decodePOSRAW(m, pkkoffs+24);}
+// if(p5==p6) {p5 = decodePOSRAW(m, pkkoffs+32); p6 = decodePOSRAW(m, pkkoffs+40);}
 
 // 6 - OK1, 0 - OK2, 5 - OK3, -1 - ERROR
 
@@ -105,17 +115,29 @@ b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
 b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 // printf("  END DECADE\n");
 
+//если по уровням пришло оба 11 или 00 то сравниваем тупо сумму значений периодов без учета уровня 1
+// if (b1==b2) { b1=decodePOSRAW(m,pkkoffs);    b2=decodePOSRAW(m,pkkoffs+ 8); }
+// if (b3==b4) { b3=decodePOSRAW(m,pkkoffs+16); b4=decodePOSRAW(m,pkkoffs+24); }
+// if (b5==b6) { b5=decodePOSRAW(m,pkkoffs+32); b6=decodePOSRAW(m,pkkoffs+40); }
+// if (b7==b8) { b7=decodePOSRAW(m,pkkoffs+48); b8=decodePOSRAW(m,pkkoffs+56); }
 
-if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
-    {
-        //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
-        result = -1;
-    }
-else
-    {
-        result = 0;
-        result = ((b1 < b2) ? 0 : 1) | ((b3 < b4) ? 0 : 2) | ((b5 < b6) ? 0 : 4) | ((b7 < b8) ? 0 : 8);
-    }
+result = 0;
+
+if(b1>b2) result|=1;
+if(b3>b4) result|=2;
+if(b5>b6) result|=4;
+if(b7>b8) result|=8;
+
+// if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
+//     {
+//         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
+//         result = -1;
+//     }
+// else
+//     {
+//         result = 0;
+//         result = ((b1 < b2) ? 0 : 1) | ((b3 < b4) ? 0 : 2) | ((b5 < b6) ? 0 : 4) | ((b7 < b8) ? 0 : 8);
+//     }
 
 return result; 
 } //end decodeDECADE
@@ -153,16 +175,30 @@ b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
 b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 // printf("  END DECADE\n");
 
-if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
-    {
-        //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
-        result = -1;
-    }
-else
-    {
-        result = 0;
-        result = ((b1 < b2) ? 0 : 8) | ((b3 < b4) ? 0 : 4) | ((b5 < b6) ? 0 : 2) | ((b7 < b8) ? 0 : 1);
-    }
+//если по уровням пришло оба 11 или 00 то сравниваем тупо сумму значений периодов без учета уровня 1
+// if (b1==b2) { b1=decodePOSRAW(m,pkkoffs);    b2=decodePOSRAW(m,pkkoffs+ 8); }
+// if (b3==b4) { b3=decodePOSRAW(m,pkkoffs+16); b4=decodePOSRAW(m,pkkoffs+24); }
+// if (b5==b6) { b5=decodePOSRAW(m,pkkoffs+32); b6=decodePOSRAW(m,pkkoffs+40); }
+// if (b7==b8) { b7=decodePOSRAW(m,pkkoffs+48); b8=decodePOSRAW(m,pkkoffs+56); }
+
+result = 0;
+
+//порядок разрядов наоборот для FUEL
+if(b1>b2) result|=8;
+if(b3>b4) result|=4;
+if(b5>b6) result|=2;
+if(b7>b8) result|=1;
+
+// if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
+//     {
+//         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
+//         result = -1;
+//     }
+// else
+//     {
+//         result = 0;
+//         result = ((b1 < b2) ? 0 : 8) | ((b3 < b4) ? 0 : 4) | ((b5 < b6) ? 0 : 2) | ((b7 < b8) ? 0 : 1);
+//     }
 
 return result; 
 } //end decodeDECADEFUEL
