@@ -119,11 +119,12 @@
 
         if(okval == 0)
         {
-    printf("+++++++++ PROCESSING OK2 CODE +++++++++\n");
-    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
-    createOK1 (ok2koord, UVD_KOORD_KODE_LEN);
-    oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
-    printf("+++++++++++++++++++++++++++++++++++++++\n");
+    printf("\n__________PROCESSING OK2 CODE__________\n");
+    createOK2 (ok2koord, UVD_KOORD_KODE_LEN, 5000);
+    oscilloscope(m, ok2koord, j,  UVD_KOORD_KODE_LEN, pulselevel);
+
+    // oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
+    printf("_______________________________________\n");
 
 
         pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;

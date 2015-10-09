@@ -1,4 +1,4 @@
-void oscilloscope(uint16_t *m, uint32_t pkkoffs,  uint32_t osclen, uint32_t pkkpulselevel) {
+void oscilloscope(uint16_t *m, uint16_t *ideal, uint32_t pkkoffs,  uint32_t osclen, uint32_t pkkpulselevel) {
 uint i, j;
 uint32_t maxsignal, delta;
 uint deltares = 10; //10 уровней анализа
@@ -26,9 +26,10 @@ for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
 {
 	//сканирование буффера длиной osclen
 	for (j = 0; j < osclen; j++) {
-		if( j<3 && (i == pulselevel) ) printf("-"); else
-		if( (delta*i) < m[pkkoffs+j] ) printf("*"); else printf(" ");
+		if( (delta*i) < m[pkkoffs+j] ) if( i == pulselevel ) printf("-"); else if (ideal[j] != 0) printf("+"); else printf("*"); else printf(" ");
 	} // end for j
+	
+	for (j = 0; j < osclen; j++) printf("_");
 	printf("\n");
 
 } //end for i
@@ -104,29 +105,29 @@ for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
     Зато и по стандарту их до 150 шт. в секунду может излучаться против 20-30 шт. (каждого подтипа) в adsb.    
 */
 
-void createOK1 (uint16_t *m, uint oklen) {
+void createOK1 (uint16_t *m, uint oklen, uint maxval) {
 	uint i;
 
-	for(i=0; i<oklen; i++) m[i]=100;
+	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0]=1000; m[1]=1000; m[2]=1000;	//формируем импульс 1,5мкс
-	m[28]=1000; m[29]=1000; m[30]=1000; //формируем импульс 1,5мкс
+	m[0]=maxval; m[1]=maxval; m[2]=maxval;	//формируем импульс 1,5мкс
+	m[28]=maxval; m[29]=maxval; m[30]=maxval; //формируем импульс 1,5мкс
 }
 
-void createOK2 (uint16_t *m, uint oklen) {
+void createOK2 (uint16_t *m, uint oklen, uint maxval) {
 	uint i;
 
-	for(i=0; i<oklen; i++) m[i]=100;
+	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0]=1000; m[1]=1000; m[2]=1000;	//формируем импульс 1,5мкс
-	m[22]=1000; m[23]=1000; m[24]=1000; //формируем импульс 1,5мкс
+	m[0]=maxval; m[1]=maxval; m[2]=maxval;	//формируем импульс 1,5мкс
+	m[22]=maxval; m[23]=maxval; m[24]=maxval; //формируем импульс 1,5мкс
 }
 
-void createOK3 (uint16_t *m, uint oklen) {
+void createOK3 (uint16_t *m, uint oklen, uint maxval) {
 	uint i;
 
-	for(i=0; i<oklen; i++) m[i]=100;
+	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0]=1000; m[1]=1000; m[2]=1000;	//формируем импульс 1,5мкс
-	m[36]=1000; m[37]=1000; m[38]=1000; //формируем импульс 1,5мкс
+	m[0]=maxval; m[1]=maxval; m[2]=maxval;	//формируем импульс 1,5мкс
+	m[36]=maxval; m[37]=maxval; m[38]=maxval; //формируем импульс 1,5мкс
 }

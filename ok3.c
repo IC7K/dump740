@@ -117,11 +117,12 @@
           ) 
         {
 
-    printf("+++++++++ PROCESSING OK3 CODE +++++++++\n");
-    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
-    createOK1 (ok3koord, UVD_KOORD_KODE_LEN);
-    oscilloscope(ok3koord, 0,  UVD_KOORD_KODE_LEN, pulselevel);             
-    printf("+++++++++++++++++++++++++++++++++++++++\n");
+    printf("\n__________PROCESSING OK3 CODE__________\n");
+    createOK3 (ok3koord, UVD_KOORD_KODE_LEN, 5000);
+    oscilloscope(m, ok3koord, j,  UVD_KOORD_KODE_LEN, pulselevel);
+
+    // oscilloscope(ok3koord, 0,  UVD_KOORD_KODE_LEN, pulselevel);             
+    printf("_______________________________________\n");
 
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 

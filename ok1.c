@@ -107,11 +107,13 @@
         if(okval==6)
         {
 
-    printf("+++++++++ PROCESSING OK1 CODE +++++++++\n");
-    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
-    createOK1 (ok1koord, UVD_KOORD_KODE_LEN);
-    oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
-    printf("+++++++++++++++++++++++++++++++++++++++\n");
+    printf("\n__________PROCESSING OK1 CODE__________\n");
+    
+    createOK1 (ok1koord, UVD_KOORD_KODE_LEN, 5000);
+    oscilloscope(m, ok1koord, j,  UVD_KOORD_KODE_LEN, pulselevel);
+    
+    // oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
+    printf("_______________________________________\n");
 
         //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
 
