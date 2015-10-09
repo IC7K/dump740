@@ -1,15 +1,15 @@
 
 uint decodePOS(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 
-return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
+return (uint32_t) ((m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8) > pkkpulselevel ? 1 : 0; 
 
 } //end decodePOS
 
-uint32_t decodePOSRAW(uint16_t *m, uint32_t pkkoffs) {
+// uint32_t decodePOSRAW(uint16_t *m, uint32_t pkkoffs) {
 
-return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7]); 
+// return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7]); 
 
-} //end decodePOS
+// } //end decodePOS
 // uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 
 // // printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
@@ -45,7 +45,7 @@ p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
 p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
 
 //если по уровням пришло оба 11 или 00 то сравниваем тупо сумму значений периодов без учета уровня 1
-// if(p1==p2) {p1 = decodePOSRAW(m, pkkoffs); 	  p2 = decodePOSRAW(m, pkkoffs+ 8);}
+// if(p1==p2) {p1 = decodePOSRAW(m, pkkoffs); 	 p2 = decodePOSRAW(m, pkkoffs+ 8);}
 // if(p3==p4) {p3 = decodePOSRAW(m, pkkoffs+16); p4 = decodePOSRAW(m, pkkoffs+24);}
 // if(p5==p6) {p5 = decodePOSRAW(m, pkkoffs+32); p6 = decodePOSRAW(m, pkkoffs+40);}
 
@@ -69,6 +69,7 @@ p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
             p5<p6       //01
           ) return 6; else
 
+        //ДРУГИХ КОМБИНАЦИЙ НЕТ (ЗК4 на будущее)
         return -1;
 
 // if(p1==p2 || p3==p4 || p5==p6)
@@ -128,11 +129,13 @@ if(b3>b4) result|=2;
 if(b5>b6) result|=4;
 if(b7>b8) result|=8;
 
-// if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
-//     {
-//         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
-//         result = -1;
-//     }
+if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
+    {
+        //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
+        result = (int) '*';
+    }
+    //ошибки нет
+    else    result+=(int) '0';    
 // else
 //     {
 //         result = 0;
@@ -189,11 +192,13 @@ if(b3>b4) result|=4;
 if(b5>b6) result|=2;
 if(b7>b8) result|=1;
 
-// if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
-//     {
-//         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
-//         result = -1;
-//     }
+if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
+    {
+        //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
+        result = -1;// (int) '*';
+    }
+    //ошибки нет
+    // else    result+=(int) '0';
 // else
 //     {
 //         result = 0;

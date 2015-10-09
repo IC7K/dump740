@@ -125,25 +125,21 @@
 
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec1==-1) continue; //11 или 00 вместо 10 или 01
-        dec1+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec2==-1) continue; //11 или 00 вместо 10 или 01
-        dec2+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec3==-1) continue; //11 или 00 вместо 10 или 01
-        dec3+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec4==-1) continue; //11 или 00 вместо 10 или 01
-        dec4+=(int) '0';
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
@@ -152,34 +148,32 @@
 
         int fuel = (dec5<10) ? dec5*5 : (dec5-5)*10;
 
+
+
         //REPEAT DECADES
         // следущее - это повторение
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec1r = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec1r==-1) continue; //11 или 00 вместо 10 или 01
-        dec1r+=(int) '0';
         // if(dec1r!=dec1) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2r = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec2r==-1) continue; //11 или 00 вместо 10 или 01
-        dec2r+=(int) '0';
         // if(dec2r!=dec2) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec3r = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec3r==-1) continue; //11 или 00 вместо 10 или 01
-        dec3r+=(int) '0';
         // if(dec3r!=dec3) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4r = decodeDECADE(m, pkkoffs, pkkpulselevel);
         // if(dec4r==-1) continue; //11 или 00 вместо 10 или 01
-        dec4r+=(int) '0';
         // if(dec4r!=dec4) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
@@ -207,7 +201,8 @@
             //     );
 
         printf("\n%s - OK2 OK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4)>>2, (char) dec3, (char) dec2, (char) dec1, fuel);            
-        printf("\n%s - OK2rOK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4r)>>2, (char) dec3r, (char) dec2r, (char) dec1r, fuelr); 
+        printf("%s - OK2rOK RKK=000 0 ALT=%c%c%c%c0m  FUEL=%d%%\n", timestr, (char) (0b1100 & dec4r)>>2, (char) dec3r, (char) dec2r, (char) dec1r, fuelr); 
+
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];
             // }

@@ -112,8 +112,7 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec1==-1) continue; //11 или 00 вместо 10 или 01
-        dec1+=(int) '0';
+        // if(dec1 == (int) '*') // continue; //11 или 00 вместо 10 или 01
         //END DECADE 1
 
 
@@ -123,8 +122,7 @@
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec2==-1) continue; //11 или 00 вместо 10 или 01
-        dec2+=(int) '0';
+        // if(dec2 != (int) '*') //continue; //11 или 00 вместо 10 или 01
         //END DECADE 2
 
 
@@ -133,19 +131,17 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
         dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec3==-1) continue; //11 или 00 вместо 10 или 01
-        dec3+=(int) '0';
+        // if(dec3==-1) dec3 = (int) '*'; else //continue; //11 или 00 вместо 10 или 01
         //END DECADE 3
 
-        
+
 
         //START DECADE 4 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec4==-1) continue; //11 или 00 вместо 10 или 01
-        dec4+=(int) '0';
+        // if(dec4==-1) dec4 = (int) '*'; else //continue; //11 или 00 вместо 10 или 01
         //END DECADE 4
 
 
@@ -155,8 +151,7 @@
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec5 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec5==-1) continue; //11 или 00 вместо 10 или 01
-        dec5+=(int) '0';
+        // if(dec5==-1) dec5 = (int) '*'; else //continue; //11 или 00 вместо 10 или 01
         //END DECADE 5
 
 
@@ -164,8 +159,7 @@
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec1r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec1r==-1) continue; //11 или 00 вместо 10 или 01
-        dec1r+=(int) '0';
+        // if(dec1r==-1) dec1r = (int) '*'; else //continue; //11 или 00 вместо 10 или 01
         // if(dec1r!=dec1) continue; 
         //END DECADE 1
 
@@ -174,8 +168,7 @@
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec2r==-1) continue; //11 или 00 вместо 10 или 01
-        dec2r+=(int) '0';
+        // if(dec2r==-1) dec2r = (int) '*'; else // continue; //11 или 00 вместо 10 или 01
         // if(dec2r!=dec2) continue;
         //END DECADE 2
 
@@ -184,8 +177,7 @@
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec3r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec3r==-1) continue; //11 или 00 вместо 10 или 01
-        dec3r+=(int) '0';
+        // if(dec3r==-1) dec3r = (int) '*'; else // continue; //11 или 00 вместо 10 или 01
         // if(dec3r!=dec3) continue;
         //END DECADE 3
 
@@ -194,8 +186,7 @@
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec4r==-1) continue; //11 или 00 вместо 10 или 01
-        dec4r+=(int) '0';
+        // if(dec4r==-1) dec4r = (int) '*'; else // continue; //11 или 00 вместо 10 или 01
         // if(dec4r!=dec4) continue;
         //END DECADE 4
 
@@ -204,8 +195,7 @@
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec5r = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        // if(dec5r==-1) continue; //11 или 00 вместо 10 или 01
-        dec5r+=(int) '0';
+        // if(dec5r==-1) dec5r = (int) '*'; else // continue; //11 или 00 вместо 10 или 01
         // if(dec5r!=dec5) continue;
         //END DECADE 5
 
@@ -226,7 +216,7 @@
             //     mediana
             //     );
             printf("\n%s - OK1 OK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1);
-            printf("\n%s - OK1rOK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5r, (char) dec4r, (char) dec3r, (char) dec2r, (char) dec1r);
+            printf("%s - OK1rOK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5r, (char) dec4r, (char) dec3r, (char) dec2r, (char) dec1r);
 
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];
