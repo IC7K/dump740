@@ -1435,38 +1435,39 @@ uint okval;
 // time_t now = time(NULL);
    
   //+++++++++++++++ TEST FILE LOAD ++++++++++++++++++++ 
-  // uint16_t* marrwrite;
-  // uint32_t lSize;
-  // size_t result;
-  //   printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
-  //   // printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
-  //   // FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
-  //   printf("Read ok2.data for RA-26001\n\n");
-  //   FILE *ifp = fopen("ok2-12-11-11-284.data", "rb");  
-  //   if(ifp==NULL) { printf("ERR OPEN FILE!"); exit(1); }
+  uint16_t* marrwrite;
+  uint32_t lSize;
+  size_t result;
 
-  //     // obtain file size:
-  //     fseek (ifp , 0 , SEEK_END);
-  //     lSize = ftell (ifp);
-  //     rewind (ifp);
+    printf("Read ok1-12-11-09-991.data = RA-26001\n\n");
+    FILE *ifp = fopen("ok1-12-11-09-991.data", "rb");
+    // printf("Read ok2.data for RA-26001\n\n");
+    // FILE *ifp = fopen("ok2-12-11-11-284.data", "rb");  
+    if(ifp==NULL) { printf("ERR OPEN FILE!"); exit(1); }
 
-  //   printf("File size=%d\n",lSize);
+      // obtain file size:
+      fseek (ifp , 0 , SEEK_END);
+      lSize = ftell (ifp);
+      rewind (ifp);
+
+    printf("File size=%d\n",lSize);
 
 
-  // // allocate memory to contain the whole file:
-  //   marrwrite = (uint16_t*) malloc (lSize);
+  // allocate memory to contain the whole file:
+    marrwrite = (uint16_t*) malloc (lSize);
+    printf("Try to read %d elements with size %d bytes, all length %d bytes\n", sizeof(marrwrite), sizeof(uint16_t), sizeof(marrwrite)*sizeof(uint16_t));
+    
+    //result = 
+    result = fread(marrwrite, sizeof(uint16_t), lSize, ifp);
 
-  //   //result = 
-  //   result = fread(marrwrite, sizeof(uint16_t), lSize, ifp);
+    if (result != (lSize/sizeof(uint16_t))) {printf("ERROR - Reading %d, but need %d\n", result, lSize/sizeof(uint16_t)); exit (3);}
 
-  //   if (result != (lSize/sizeof(uint16_t))) {printf("ERROR - Reading %d, but need %d\n", result, lSize/sizeof(uint16_t)); exit (3);}
+    fclose(ifp);
 
-  //   fclose(ifp);
-
-  //   for(i=0;i<result;i++) {
-  //   m[i]=marrwrite[i];
-  //   // printf("%x ", m[i]);
-  //   }
+    for(i=0;i<result;i++) {
+    m[i]=marrwrite[i];
+    // printf("%x ", m[i]);
+    }
   //+++++++++++++++ TEST FILE LOAD ++++++++++++++++++++ 
 // pulselevel = 999999;
 
@@ -1498,7 +1499,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
     // printf("PULSE=%d ", pulselevel);
 
     //если начало не идет с импульса (PK1) то сдвигаем окно на следующий период
-    if(m[j]<pulselevel) { continue; }
+    // if(m[j]<pulselevel) { continue; }
 
     /*
     Для передачи сообщения используется натуральный двоично-десятичный четырехразрядный код с активной паузой,
