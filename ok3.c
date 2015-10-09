@@ -3,6 +3,11 @@
     if((uint32_t) ((m[j+35]+m[j+36]+m[j+37])/3)>pulselevel) {         
     //OK3
     //t=10mks 101
+
+    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
+    createOK1 (ok3koord, UVD_KOORD_KODE_LEN);
+    oscilloscope(ok3koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
+
     /*
     [37]  т=0,5 мкс       
     [38]  т=1 мкс       

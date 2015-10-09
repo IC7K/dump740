@@ -3,6 +3,11 @@
     if((uint32_t) ((m[j+21]+m[j+22]+m[j+23])/3)>pulselevel) {
     //OK2
     //t=14mks 000
+
+    oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
+    createOK1 (ok2koord, UVD_KOORD_KODE_LEN);
+    oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
+
     /*
     [23]  т=0,5 мкс       
     [24]  т=1 мкс       
@@ -124,27 +129,27 @@
         pkkpulselevel = pulselevel;
 
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
+        // if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec2 == (int) '*') continue; //11 или 00 вместо 10 или 01
+        // if(dec2 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec3 == (int) '*') continue; //11 или 00 вместо 10 или 01
+        // if(dec3 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
-        if(dec4 == (int) '*') continue; //11 или 00 вместо 10 или 01
+        // if(dec4 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
         dec5 = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
-        if(dec5 == -1) continue; //11 или 00 вместо 10 или 01
+        // if(dec5 == -1) continue; //11 или 00 вместо 10 или 01
 
         int fuel = (dec5<10) ? dec5*5 : (dec5-5)*10;
 
