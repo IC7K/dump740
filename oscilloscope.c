@@ -21,6 +21,7 @@ if(delta==0) delta=1;
 pulselevel = pkkpulselevel/delta;
 
 printf("\n");
+printf("Noise Lev=%d  Max=%d\n  VResolution=%d\n", pkkpulselevel, maxsignal, delta);
 
 for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
 {
@@ -127,7 +128,7 @@ void createOK2 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 }
 
 void createOK3 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
-	uint i, alllen;
+	uint i;
 
 	oklen = oklen + beforeafter*2;
 	for(i=0; i<oklen; i++) m[i]=0;
