@@ -9,14 +9,13 @@ uint i;
 
 uint deltares = 10; //10 уровней анализа шума
 
-// char timestrr[20];
-// struct timeval tp;
-// gettimeofday(&tp, 0);
-// time_t curtime = tp.tv_sec;
-// struct tm *t = localtime(&curtime);
-// sprintf(timestrr, "%02d:%02d:%02d.%03d", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
+char timestr[20]/*, filestr[20]*/;
+struct timeval tp;
+gettimeofday(&tp, 0);
+time_t curtime = tp.tv_sec;
+struct tm *t = localtime(&curtime);
+sprintf(timestr, "%02d:%02d:%02d.%03d", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
 
-// time (&start);
 
 for (i = 0; i< deltares; i++)
 {
@@ -50,7 +49,7 @@ for (i = 0; i < (deltares-1); i++)
 {
 	//разница между спектрами более чем 3 раза считаем за порог шума
 	//ставим уровень на пару delta выше
-	if( levels[i] > (levels[i+1]*3) ) { noiselevel = delta*(i+1); break; }
+	if( levels[i] > (levels[i+1]*2) ) { noiselevel = delta*(i+1); break; }
 	//если такого порога нет то
 	else noiselevel = (maxsignal / 2);
 }
@@ -61,7 +60,7 @@ for (i = 0; i < (deltares-1); i++)
 
 // printf("Noise level = %d - Before %d  After %d  - Time=%.9lf\n\n", noiselevel, levels[i], levels[i+1], dif);
 
-// printf("%s - Noise level = %05d - Max sig %05d  Delta %05d\r", timestr, noiselevel, maxsignal, delta);
+printf("%s - Noise level = %05d - Max sig %05d  Delta %05d\r", timestr, noiselevel, maxsignal, delta);
 
 return noiselevel;
 
