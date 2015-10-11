@@ -48,9 +48,11 @@ for (i = 0; i< deltares; i++)
 noiselevel = 0;
 for (i = 0; i < (deltares-1); i++)
 {
-	//разница в количесвте шумов более чем 3 раза считаем за порог шума
+	//разница между спектрами более чем 3 раза считаем за порог шума
 	//ставим уровень на пару delta выше
 	if( levels[i] > (levels[i+1]*3) ) { noiselevel = delta*(i+2); break; }
+	//если такого порога нет то
+	else noiselevel = maxsignal / 2+maxsignal / 4;
 }
 
 // time (&end);
@@ -58,7 +60,7 @@ for (i = 0; i < (deltares-1); i++)
 
 // printf("Noise level = %d - Before %d  After %d  - Time=%.9lf\n\n", noiselevel, levels[i], levels[i+1], dif);
 
-printf("%s - Noise level = %05d - Max sig %05d  Delta %05d\r", timestr, noiselevel, maxsignal, delta);
+// printf("%s - Noise level = %05d - Max sig %05d  Delta %05d\r", timestr, noiselevel, maxsignal, delta);
 
 return noiselevel;
 
