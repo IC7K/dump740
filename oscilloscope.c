@@ -106,29 +106,32 @@ for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
     Зато и по стандарту их до 150 шт. в секунду может излучаться против 20-30 шт. (каждого подтипа) в adsb.    
 */
 
-void createOK1 (uint16_t *m, uint oklen, uint maxval) {
+void createOK1 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 	uint i;
 
+	oklen = oklen + beforeafter*2;
 	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0]=maxval; m[1]=100; m[2]=100;	//формируем импульс 1,5мкс
-	m[28]=maxval; m[29]=100; m[30]=100; //формируем импульс 1,5мкс
+	m[0+beforeafter]=maxval; m[1+beforeafter]=100; m[2+beforeafter]=100;	//формируем импульс 1,5мкс
+	m[28+beforeafter]=maxval; m[29+beforeafter]=100; m[30+beforeafter]=100; //формируем импульс 1,5мкс
 }
 
-void createOK2 (uint16_t *m, uint oklen, uint maxval) {
+void createOK2 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 	uint i;
 
+	oklen = oklen + beforeafter*2;
 	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0]=maxval; m[1]=100; m[2]=100;	//формируем импульс 1,5мкс
-	m[22]=maxval; m[23]=100; m[24]=100; //формируем импульс 1,5мкс
+	m[0+beforeafter]=maxval; m[1+beforeafter]=100; m[2+beforeafter]=100;	//формируем импульс 1,5мкс
+	m[22+beforeafter]=maxval; m[23+beforeafter]=100; m[24+beforeafter]=100; //формируем импульс 1,5мкс
 }
 
-void createOK3 (uint16_t *m, uint oklen, uint maxval) {
-	uint i;
+void createOK3 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
+	uint i, alllen;
 
+	oklen = oklen + beforeafter*2;
 	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0]=maxval; m[1]=100; m[2]=100;	//формируем импульс 1,5мкс
-	m[36]=maxval; m[37]=100; m[38]=100; //формируем импульс 1,5мкс
+	m[0+beforeafter]=maxval; m[1+beforeafter]=100; m[2+beforeafter]=100;	//формируем импульс 1,5мкс
+	m[36+beforeafter]=maxval; m[37+beforeafter]=100; m[38+beforeafter]=100; //формируем импульс 1,5мкс
 }

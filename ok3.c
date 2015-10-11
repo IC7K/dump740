@@ -118,8 +118,8 @@
         {
 
     printf("\n__________PROCESSING OK3 CODE__________\n");
-    createOK3 (ok3koord, UVD_KOORD_KODE_LEN, 5000);
-    oscilloscope(m, ok3koord, j,  UVD_KOORD_KODE_LEN, pulselevel);
+    createOK3 (ok3koord, UVD_KOORD_KODE_LEN, 5000 , 10);
+    oscilloscope(m, ok3koord, j-10,  UVD_KOORD_KODE_LEN+20, pulselevel);
 
     // oscilloscope(ok3koord, 0,  UVD_KOORD_KODE_LEN, pulselevel);             
 

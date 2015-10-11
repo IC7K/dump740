@@ -120,8 +120,8 @@
         if(okval == 0)
         {
     printf("\n__________PROCESSING OK2 CODE__________\n");
-    createOK2 (ok2koord, UVD_KOORD_KODE_LEN, 5000);
-    oscilloscope(m, ok2koord, j,  UVD_KOORD_KODE_LEN, pulselevel);
+    createOK2 (ok2koord, UVD_KOORD_KODE_LEN, 5000, 10);
+    oscilloscope(m, ok2koord, j-10,  UVD_KOORD_KODE_LEN+20, pulselevel);
 
     // oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
 

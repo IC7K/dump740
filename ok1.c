@@ -109,8 +109,8 @@
 
     printf("\n__________PROCESSING OK1 CODE__________\n");
     
-    createOK1 (ok1koord, UVD_KOORD_KODE_LEN, 5000);
-    oscilloscope(m, ok1koord, j,  UVD_KOORD_KODE_LEN, pulselevel);
+    createOK1 (ok1koord, UVD_KOORD_KODE_LEN, 5000, 10);
+    oscilloscope(m, ok1koord, j-10,  UVD_KOORD_KODE_LEN+20, pulselevel);
     
     // oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
 
