@@ -1361,7 +1361,7 @@ uint32_t pulselevel, pkkpulselevel;
 uint32_t p1, p2, p3, p4, p5, p6;
 int dec1, dec2, dec3, dec4, dec5;
 int dec1r, dec2r, dec3r, dec4r, dec5r;
-uint32_t i, j, pkkoffs;
+uint32_t /*i,*/ j, pkkoffs;
 uint okval;
 
 uint16_t ok1koord[UVD_KOORD_KODE_LEN];  //идеальная форма сигнала OK1 для сранения
@@ -1458,7 +1458,7 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
 
 
-    char timestr[20], filestr[20];
+    char timestr[20]/*, filestr[20]*/;
     struct timeval tp;
     gettimeofday(&tp, 0);
     time_t curtime = tp.tv_sec;

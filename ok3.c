@@ -117,40 +117,48 @@
           ) 
         {
 
-    printf("\n__________PROCESSING OK3 CODE__________\n");
-    createOK3 (ok3koord, UVD_KOORD_KODE_LEN, 5000 , 10);
-    oscilloscope(m, ok3koord, j-10,  UVD_KOORD_KODE_LEN+20, pulselevel);
-
-    // oscilloscope(ok3koord, 0,  UVD_KOORD_KODE_LEN, pulselevel);             
+    // printf("\n__________PROCESSING OK3 CODE__________\n");
+    // createOK3 (ok3koord, UVD_KOORD_KODE_LEN, 5000 , 10);
+    // oscilloscope(m, ok3koord, j-10,  UVD_KOORD_KODE_LEN+20, pulselevel);
+        
 
 
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3
 
-            uint16_t marwrite[UVD_MAX_LEN];
-
-            for(i=0;i<UVD_MAX_LEN;i++) {
-            marwrite[i] = m[j+i];
-            }
-
-            sprintf(filestr, "ok3-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
-            FILE *f = fopen(filestr, "wb");
-            fwrite(marwrite, sizeof(uint16_t), sizeof(marwrite), f);
-            fclose(f);
 
 
-            printf("\n%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d OK3VAL(5)=%d\n",
-                timestr,
-                m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
-                m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
-                m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
-                m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
-                m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
-                m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
-                m[j],
-                pulselevel,
-                okval
-                // mediana
-                );
+
+            // printf("\n%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d OK3VAL(5)=%d\n",
+            //     timestr,
+            //     m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
+            //     m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
+            //     m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
+            //     m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
+            //     m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
+            //     m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
+            //     m[j],
+            //     pulselevel,
+            //     okval
+            //     // mediana
+            //     );
+
+
+
+
+
+
+
+            // uint16_t marwrite[UVD_MAX_LEN];
+
+            // for(i=0;i<UVD_MAX_LEN;i++) {
+            // marwrite[i] = m[j+i];
+            // }
+
+            // sprintf(filestr, "ok3-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
+            // FILE *f = fopen(filestr, "wb");
+            // fwrite(marwrite, sizeof(uint16_t), sizeof(marwrite), f);
+            // fclose(f);
+
 
             j+=UVD_KOORD_KODE_LEN+UVD_OK3_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
             continue;
