@@ -21,7 +21,7 @@ if(delta==0) delta=1;
 pulselevel = pkkpulselevel/delta;
 
 printf("\n");
-printf("Noise Lev=%d  Max=%d  VResolution=%d\n", pkkpulselevel, maxsignal, delta);
+printf("Noise Lev=%d  Max=%d  VResolution=%d HLen=%d\n", pkkpulselevel, maxsignal, delta, osclen);
 
 for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
 {

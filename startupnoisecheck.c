@@ -34,6 +34,8 @@ if(maxsignal<m[noise]) maxsignal = m[noise];
 //насколько разбиваем уровень сигнала
 delta = maxsignal / deltares;
 
+
+
 //сканирование буффера длиной mlen, смотрим каждый 100-ый элемент для ускорения
 for (noise = 0; noise < mlen; noise+=100) {
 
@@ -43,6 +45,8 @@ for (i = 0; i< deltares; i++)
 } // end for i
 
 } //end for noise
+
+
 
 noiselevel = 0;
 for (i = 0; i < (deltares-1); i++)
