@@ -1,4 +1,4 @@
-void oscilloscope(uint16_t *m, uint16_t *ideal, uint32_t pkkoffs,  uint32_t osclen, uint32_t pkkpulselevel) {
+void oscilloscope(uint16_t *m, uint16_t *ideal, uint32_t pkkoffs,  uint32_t osclen, uint32_t pkkpulselevel, char* timestamp) {
 uint i, j;
 uint32_t maxsignal, delta;
 uint deltares = 10; //10 уровней анализа
@@ -22,7 +22,7 @@ if(delta==0) delta=1;
 pulselevel = pkkpulselevel/delta;
 
 printf("\n");
-printf("Noise Lev=%d  Max=%d  VResolution=%d HLen=%d\n", pkkpulselevel, maxsignal, delta, osclen);
+printf("%s - Noise Lev=%d  Max=%d  VResolution=%d HLen=%d\n", timestamp, pkkpulselevel, maxsignal, delta, osclen);
 
 for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
 {
@@ -114,9 +114,9 @@ void createOK1 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 	oklen = oklen + beforeafter*2;
 	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0+beforeafter]= maxval;  m[1+beforeafter]= 100; m[2+beforeafter]= 100; //формируем импульс 1,5мкс PK1
-	m[12+beforeafter]=maxval;  m[13+beforeafter]=100; m[14+beforeafter]=100; //шасси выпущено 			PK2
-	m[28+beforeafter]=maxval;  m[29+beforeafter]=100; m[30+beforeafter]=100; //формируем импульс 1,5мкс PK3
+	m[0+beforeafter]= maxval;  m[1+beforeafter]=  50; m[2+beforeafter]=  50; //формируем импульс 1,5мкс PK1
+	// m[12+beforeafter]=maxval;  m[13+beforeafter]=50; m[14+beforeafter]=50; //шасси выпущено 			PK2
+	m[28+beforeafter]=maxval;  m[29+beforeafter]= 50; m[30+beforeafter]= 50; //формируем импульс 1,5мкс PK3
 
     //OK1
     //t=8.5mks 110
@@ -208,12 +208,12 @@ void createOK1 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
     */  
 
 	for (i=45; i<48; i++)	m[i+beforeafter]=maxval; //1
-	for (i=53; i<56; i++)	m[i+beforeafter]=100;	 //0 = 10
+	for (i=53; i<56; i++)	m[i+beforeafter]=50;	 //0 = 10
 
 	for (i=61; i<64; i++)	m[i+beforeafter]=maxval; //1
-	for (i=69; i<72; i++)	m[i+beforeafter]=100;	 //0 = 10
+	for (i=69; i<72; i++)	m[i+beforeafter]=50;	 //0 = 10
 
-	for (i=77; i<80; i++)	m[i+beforeafter]=100; 	 //0
+	for (i=77; i<80; i++)	m[i+beforeafter]=50; 	 //0
 	for (i=85; i<88; i++)	m[i+beforeafter]=maxval; //1 = 01			
 }
 

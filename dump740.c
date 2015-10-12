@@ -1347,12 +1347,21 @@ void applyPhaseCorrection(uint16_t *m) {
 //     return m[j];
 // }
 
+void GetTimeUVD(char* timestr) {
+    struct timeval tp;
+    gettimeofday(&tp, 0);
+    time_t curtime = tp.tv_sec;
+    struct tm *t = localtime(&curtime);
+    sprintf(timestr, "%02d:%02d:%02d.%03d", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);    
+}
 
 /* Detect a UVD responses inside the magnitude buffer pointed by 'm' and of
  * size 'mlen' bytes. 
  * Every detected UVD message is convert it into a
  * stream of bits and passed to the function to display it. */
 void detectUVD(uint16_t *m, uint32_t mlen) {
+
+char timestr[20]/*, filestr[20]*/;
 
 //UVD_KOORD_KODE_LEN
 
@@ -1458,26 +1467,28 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
 
 
-    char timestr[20]/*, filestr[20]*/;
-    struct timeval tp;
-    gettimeofday(&tp, 0);
-    time_t curtime = tp.tv_sec;
-    struct tm *t = localtime(&curtime);
-    sprintf(timestr, "%02d:%02d:%02d.%03d", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
+    // char timestr[20]/*, filestr[20]*/;
+    // struct timeval tp;
+    // gettimeofday(&tp, 0);
+    // time_t curtime = tp.tv_sec;
+    // struct tm *t = localtime(&curtime);
+    // sprintf(timestr, "%02d:%02d:%02d.%03d", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
     // regnumber[0] = (char) (int) '0'; //+1);
     // printf("regnumber=%c",regnumber[0]);
 
 
     //******************* OK1 **********************
-
+GetTimeUVD(timestr);
 #include </home/pi/dump740/ok1.c>
 
-    //******************* OK2 **********************
 
+
+    //******************* OK2 **********************
+GetTimeUVD(timestr);
 #include </home/pi/dump740/ok2.c>
 
     //******************* OK3 **********************
-
+GetTimeUVD(timestr);
 #include </home/pi/dump740/ok3.c>
 
 
