@@ -230,14 +230,14 @@ void createOK1 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 
     */  
 
-	for (i=45; i<48; i++)	m[i+beforeafter]=maxval; //1
-	for (i=53; i<56; i++)	m[i+beforeafter]=50;	 //0 = 10
+	for (i=45; i<53; i++)	m[i+beforeafter]=maxval; //1
+	for (i=53; i<61; i++)	m[i+beforeafter]=50;	 //0 = 10
 
-	for (i=61; i<64; i++)	m[i+beforeafter]=maxval; //1
-	for (i=69; i<72; i++)	m[i+beforeafter]=50;	 //0 = 10
+	for (i=61; i<69; i++)	m[i+beforeafter]=maxval; //1
+	for (i=69; i<77; i++)	m[i+beforeafter]=50;	 //0 = 10
 
-	for (i=77; i<80; i++)	m[i+beforeafter]=50; 	 //0
-	for (i=85; i<88; i++)	m[i+beforeafter]=maxval; //1 = 01			
+	for (i=77; i<85; i++)	m[i+beforeafter]=50; 	 //0
+	for (i=85; i<93; i++)	m[i+beforeafter]=maxval; //1 = 01			
 }
 
 

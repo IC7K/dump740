@@ -1,21 +1,14 @@
 //возвращает уровень шума
-uint32_t startupNOISE(uint16_t *m, uint32_t mlen) {
+uint32_t startupNOISE(uint16_t *m, uint32_t mlen, char* ntimestr ) {
 uint32_t maxsignal, delta, noiselevel;
 uint32_t levels[10];
 uint32_t noise;
 uint i;
+uint32_t howvals, mediana, linotkl;//, dispersion, srkvotkl;
 // time_t start,end;
 // double dif;
 
 uint deltares = 10; //10 уровней анализа шума
-
-char timestr[20]/*, filestr[20]*/;
-struct timeval tp;
-gettimeofday(&tp, 0);
-time_t curtime = tp.tv_sec;
-struct tm *t = localtime(&curtime);
-sprintf(timestr, "%02d:%02d:%02d.%03d", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
-
 
 for (i = 0; i< deltares; i++)
 {
@@ -25,11 +18,50 @@ levels[i] = 0;
 maxsignal = 0;
 // minsignal = 0;
 
+mediana = 0;
+howvals = 0;
 //сканирование буффера длиной mlen, смотрим каждый 100-ый элемент для ускорения
 for (noise = 0; noise < mlen; noise+=100) {
 if(maxsignal<m[noise]) maxsignal = m[noise];
-// if(minsignal>m[noise]) minsignal = m[noise];
+
+//значения для среднего отклонения
+mediana+=m[noise];
+howvals++;
 } //end for
+
+
+//++++++++++++++++++++++++++++++++++++++++++++
+mediana = mediana / howvals;
+
+//сканирование буффера длиной mlen, смотрим каждый 100-ый элемент для ускорения
+linotkl = 0;
+for (noise = 0; noise < mlen; noise+=100) {
+linotkl+= abs(m[noise] - mediana);
+} //end for
+
+//расчет среднего линейного отклонения
+linotkl = linotkl / howvals;
+
+
+// //сканирование буффера длиной mlen, смотрим каждый 100-ый элемент для ускорения
+// dispersion = 0;
+// for (noise = 0; noise < mlen; noise+=100) {
+// dispersion+= (m[noise] - mediana)^2;
+// } //end for
+
+// //дисперсия
+// dispersion = dispersion / howvals;
+
+// //среднеквадратичное отклоненение
+// srkvotkl = sqrt(dispersion);
+
+
+// printf("%s - MED = %05d  LINOTKL=%05d  DISP=%05d  SRKVOTKL=%05d\n", ntimestr, mediana, linotkl, dispersion, srkvotkl);
+//++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
 
 //насколько разбиваем уровень сигнала
 delta = maxsignal / deltares;
@@ -61,7 +93,7 @@ for (i = 0; i < (deltares-1); i++)
 	noiselevel+=delta*2;
 
 
-// printf("%s - Noise level = %05d - Max sig %05d  Delta %05d\r", timestr, noiselevel, maxsignal, delta);
+// printf("%s - Noise level = %05d (%05d) - Max sig %05d  Delta %05d  MED = %05d  LINOTKL=%05d\r", ntimestr, noiselevel, mediana+linotkl, maxsignal, delta, mediana, linotkl);
 
 
 return noiselevel;

@@ -110,7 +110,7 @@
     printf("\n__________PROCESSING OK1 CODE__________\n");
     
     createOK1   (ok1koord,           92,    5000, 10); //KOORD+DELAY1+KEY
-    oscilloscope(m, ok1koord, j-10,  112, pulselevel, timestr); //10+92+10=112
+    oscilloscope(m, ok1koord, j-10,  112, pulselevel, timestrok1); //10+92+10=112
     
     // oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
 
@@ -224,8 +224,8 @@
             //     pulselevel,
             //     mediana
             //     );
-            printf("\n%s - OK1 OK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1);
-            printf("%s - OK1rOK RKK=110 6 REGN=%c%c%c%c%c\n", timestr, (char) dec5r, (char) dec4r, (char) dec3r, (char) dec2r, (char) dec1r);
+            printf("\n%s - OK1 OK RKK=110 6 REGN=%c%c%c%c%c\n", timestrok1, (char) dec5, (char) dec4, (char) dec3, (char) dec2, (char) dec1);
+            printf("%s - OK1rOK RKK=110 6 REGN=%c%c%c%c%c\n", timestrok1, (char) dec5r, (char) dec4r, (char) dec3r, (char) dec2r, (char) dec1r);
 
             // for(i=0;i<UVD_MAX_LEN;i++) {
             // marrwrite[i] = m[j+i];

@@ -1362,7 +1362,7 @@ void GetTimeUVD(char *timestr) {
 void detectUVD(uint16_t *m, uint32_t mlen) {
 
 
-char timestr[20];
+char timestrnoise[20], timestrok1[20], timestrok2[20], timestrok3[20];
 
 // char* timestr[20]/*, filestr[20]*/;
 
@@ -1425,8 +1425,8 @@ uint16_t ok3koord[UVD_KOORD_KODE_LEN];  //идеальная форма сигн
 
     // printf ("binary: %d\n",0^~8);
 
-
-    pulselevel = startupNOISE(m,mlen);       // Do some calculation.
+GetTimeUVD(timestrnoise);
+pulselevel = startupNOISE(m, mlen, timestrnoise);       // Do some calculation.
 
     // oscilloscope(m, 0,  UVD_KOORD_KODE_LEN, pulselevel);
     // createOK1 (ok1koord, UVD_KOORD_KODE_LEN);
@@ -1481,17 +1481,15 @@ for (j = 0; j < mlen-UVD_MAX_LEN; j++) {
 
 
     //******************* OK1 **********************
-GetTimeUVD(timestr);
+GetTimeUVD(timestrok1);
 #include </home/pi/dump740/ok1.c>
 
-
-
     //******************* OK2 **********************
-GetTimeUVD(timestr);
+GetTimeUVD(timestrok2);
 #include </home/pi/dump740/ok2.c>
 
     //******************* OK3 **********************
-GetTimeUVD(timestr);
+GetTimeUVD(timestrok3);
 #include </home/pi/dump740/ok3.c>
 
 
