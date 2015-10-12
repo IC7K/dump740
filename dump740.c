@@ -1347,7 +1347,7 @@ void applyPhaseCorrection(uint16_t *m) {
 //     return m[j];
 // }
 
-void GetTimeUVD(char* timestr) {
+void GetTimeUVD(char *timestr) {
     struct timeval tp;
     gettimeofday(&tp, 0);
     time_t curtime = tp.tv_sec;
@@ -1361,7 +1361,10 @@ void GetTimeUVD(char* timestr) {
  * stream of bits and passed to the function to display it. */
 void detectUVD(uint16_t *m, uint32_t mlen) {
 
-char timestr[20]/*, filestr[20]*/;
+
+char timestr[20];
+
+// char* timestr[20]/*, filestr[20]*/;
 
 //UVD_KOORD_KODE_LEN
 

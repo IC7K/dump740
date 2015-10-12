@@ -28,7 +28,30 @@ for (i = (deltares); (i+1)>0; i--) //10 строк по вертикали
 {
 	//сканирование буффера длиной osclen
 	for (j = 0; j < osclen; j++) {
-		if( (delta*i) < m[pkkoffs+j] ) if( i == pulselevel ) printf("-"); else if (ideal[j] != 0) printf("|"); else printf("*"); else printf(" ");
+		if( (delta*i) < m[pkkoffs+j] ) 
+		{
+			if( i == pulselevel ) 
+				{
+				printf("-"); 
+				} //-	
+				else 
+					{
+						if (ideal[j] == 50) 
+							{
+								printf("0");
+							}
+							else
+							{
+								if (ideal[j] > 50)
+									{
+										printf("1");
+									} 
+									else printf("*");
+							}
+					}
+		}
+		else printf(" ");
+
 	} // end for j
 	printf("\n");
 
@@ -114,9 +137,9 @@ void createOK1 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 	oklen = oklen + beforeafter*2;
 	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0+beforeafter]= maxval;  m[1+beforeafter]=  50; m[2+beforeafter]=  50; //формируем импульс 1,5мкс PK1
-	// m[12+beforeafter]=maxval;  m[13+beforeafter]=50; m[14+beforeafter]=50; //шасси выпущено 			PK2
-	m[28+beforeafter]=maxval;  m[29+beforeafter]= 50; m[30+beforeafter]= 50; //формируем импульс 1,5мкс PK3
+	m[0+beforeafter]= maxval;  m[1+beforeafter]=  maxval;  m[2+beforeafter]=  maxval; //формируем импульс 1,5мкс PK1
+	// m[12+beforeafter]=maxval;  m[13+beforeafter]=maxval; m[14+beforeafter]=maxval; //шасси выпущено 			PK2
+	m[28+beforeafter]=maxval;  m[29+beforeafter]= maxval;; m[30+beforeafter]= maxval; //формируем импульс 1,5мкс PK3
 
     //OK1
     //t=8.5mks 110
