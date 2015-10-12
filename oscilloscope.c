@@ -13,6 +13,7 @@ if(maxsignal<m[i]) maxsignal = m[i];
 // if(minsignal>m[noise]) minsignal = m[noise];
 } //end for
 
+if (maxsignal < pkkpulselevel) maxsignal = pkkpulselevel;
 //насколько разбиваем уровень сигнала
 delta = maxsignal / deltares;
 
@@ -114,7 +115,7 @@ void createOK1 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 	for(i=0; i<oklen; i++) m[i]=0;
 
 	m[0+beforeafter]= maxval;  m[1+beforeafter]= 100; m[2+beforeafter]= 100; //формируем импульс 1,5мкс PK1
-	m[12+beforeafter]=maxval;  m[13+beforeafter]=100; m[24+beforeafter]=100; //шасси выпущено 			PK2
+	m[12+beforeafter]=maxval;  m[13+beforeafter]=100; m[14+beforeafter]=100; //шасси выпущено 			PK2
 	m[28+beforeafter]=maxval;  m[29+beforeafter]=100; m[30+beforeafter]=100; //формируем импульс 1,5мкс PK3
 
     //OK1
@@ -206,14 +207,14 @@ void createOK1 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 
     */  
 
-	for (i=45; i<53; i++)	m[i+beforeafter]=maxval; //1
-	for (i=53; i<61; i++)	m[i+beforeafter]=100;	 //0 = 10
+	for (i=45; i<48; i++)	m[i+beforeafter]=maxval; //1
+	for (i=53; i<56; i++)	m[i+beforeafter]=100;	 //0 = 10
 
-	for (i=61; i<69; i++)	m[i+beforeafter]=maxval; //1
-	for (i=69; i<77; i++)	m[i+beforeafter]=100;	 //0 = 10
+	for (i=61; i<64; i++)	m[i+beforeafter]=maxval; //1
+	for (i=69; i<72; i++)	m[i+beforeafter]=100;	 //0 = 10
 
-	for (i=77; i<85; i++)	m[i+beforeafter]=100; 	 //0
-	for (i=85; i<93; i++)	m[i+beforeafter]=maxval; //1 = 01			
+	for (i=77; i<80; i++)	m[i+beforeafter]=100; 	 //0
+	for (i=85; i<88; i++)	m[i+beforeafter]=maxval; //1 = 01			
 }
 
 
