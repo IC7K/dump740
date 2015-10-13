@@ -1,6 +1,6 @@
     //******************* OK1 **********************
 
-    if(m[j+28]>=pulselevel || m[j+29]>=pulselevel || m[j+30]>=pulselevel) {          
+    if(((m[j+28]>=pulselevel+m[j+29])/2)>=pulselevel) {          
     //OK1
     //t=8.5mks 110
     /*
@@ -107,10 +107,10 @@
         if(okval==1)
         {
 
-    printf("\n__________PROCESSING OK1 CODE__________\n");
-    
-    createOK1   (ok1koord,           92,    5000, 10); //KOORD+DELAY1+KEY
-    oscilloscope(m, ok1koord, j-10,  112, pulselevel, timestrok1); //10+92+10=112
+        printf("\n__________PROCESSING OK1 CODE__________\n");
+        
+        createOK1   (ok1koord,           92,    5000, 10); //KOORD+DELAY1+KEY
+        oscilloscope(m, ok1koord, j-10,  112, pulselevel, timestrok1); //10+92+10=112
     
     // oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
 

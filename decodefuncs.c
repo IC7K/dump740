@@ -17,7 +17,8 @@ int decodePKI16(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 //детектируем 1 в первом разряде
 //считаем за 1 превышение в первые 1,5мкс уровня порога
 // if(m[pkkoffs]>pkkpulselevel || m[pkkoffs+1]>pkkpulselevel || m[pkkoffs+2]>pkkpulselevel) //слишком много срабатываний
-if( (uint32_t )((m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2])/3)>pkkpulselevel)    
+    //видел импульс и 1 мкс!!!!!!!!!!
+if( (uint32_t )((m[pkkoffs]+m[pkkoffs+1])/2)>pkkpulselevel)    
     {
     //считаем код за 1
     // maxlevel = 0;
@@ -40,7 +41,8 @@ if( (uint32_t )((m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2])/3)>pkkpulselevel)
 //считаем за 1 превышение в первые 1,5мкс уровня порога  
 
 // if(m[pkkoffs+8]>pkkpulselevel || m[pkkoffs+9]>pkkpulselevel || m[pkkoffs+10]>pkkpulselevel) //слишком много срабатываний
-if((uint32_t )((m[pkkoffs+8]+m[pkkoffs+9]+m[pkkoffs+10])/3)>pkkpulselevel)       
+    //видел импульс и 1 мкс!!!!!!!!!!
+if((uint32_t )((m[pkkoffs+8]+m[pkkoffs+9])/2)>pkkpulselevel)       
    {
     //считаем код за 1
     // maxlevel = 0;
@@ -91,7 +93,7 @@ return -1;
 int decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;    
 // uint32_t p1, p2, p3, p4, p5, p6;
-uint b1, b2, b3;
+int b1, b2, b3;
 // uint result;
 
 
@@ -154,45 +156,36 @@ return -1;
 
 int decodeDECADE(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;
-uint result, b1, b2, b3, b4, b5, b6, b7, b8;
+int result, b1, b2, b3, b4;//, b5, b6, b7, b8;
 
-//определение среднего значения в ряде периодов для выделения посылки над помехами
-// pkkmediana = 0;
-// pkkend = pkkoffs + UVD_DECADE_LEN;
-// for (i = pkkoffs; i < pkkend; i++) { 
-//     pkkmediana+=m[i]; //SUMM(ALL)
-// }    
-// pkkmediana = pkkmediana / UVD_DECADE_LEN;     
-// pkkpulselevel = pkkmediana / 2 + pkkmediana;
 
-// printf("START DECADE ");
-b1 = decodePOS(m, pkkoffs,    pkkpulselevel);
-b2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
-// printf(" ");
-b3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
-b4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
-// printf(" ");
-b5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
-b6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
-// printf(" ");
-b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
-b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
+b1 = decodePKI16(m, pkkoffs,    pkkpulselevel);
+b2 = decodePKI16(m, pkkoffs+16, pkkpulselevel);
+b3 = decodePKI16(m, pkkoffs+32, pkkpulselevel);
+b4 = decodePKI16(m, pkkoffs+48, pkkpulselevel);
+
+// b1 = decodePOS(m, pkkoffs,    pkkpulselevel);
+// b2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
+// // printf(" ");
+// b3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
+// b4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
+// // printf(" ");
+// b5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
+// b6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
+// // printf(" ");
+// b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
+// b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 // printf("  END DECADE\n");
 
-//если по уровням пришло оба 11 или 00 то сравниваем тупо сумму значений периодов без учета уровня 1
-// if (b1==b2) { b1=decodePOSRAW(m,pkkoffs);    b2=decodePOSRAW(m,pkkoffs+ 8); }
-// if (b3==b4) { b3=decodePOSRAW(m,pkkoffs+16); b4=decodePOSRAW(m,pkkoffs+24); }
-// if (b5==b6) { b5=decodePOSRAW(m,pkkoffs+32); b6=decodePOSRAW(m,pkkoffs+40); }
-// if (b7==b8) { b7=decodePOSRAW(m,pkkoffs+48); b8=decodePOSRAW(m,pkkoffs+56); }
 
 result = 0;
 
-if(b1>b2) result|=1;
-if(b3>b4) result|=2;
-if(b5>b6) result|=4;
-if(b7>b8) result|=8;
+if(b1==1) result|=1;
+if(b2==1) result|=2;
+if(b3==1) result|=4;
+if(b4==1) result|=8;
 
-if(b1==b2 || b3==b4 || b5==b6 || b7==b8)
+if(b1==-1 || b2==-1 || b3==-1 || b4==-1)
     {
         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
         result = (int) '*';

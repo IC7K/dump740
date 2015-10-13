@@ -84,7 +84,7 @@ noiselevel = 0;
 for (i = 0; i < (deltares-1); i++)
 {
 	//разница между спектрами более чем 4 раза считаем за порог шума
-	if( levels[i] > (levels[i+1]*3) ) { noiselevel = delta*(i+1); break; }
+	if( levels[i] > (levels[i+1]*4) ) { noiselevel = delta*(i+1); break; }
 	//если такого порога нет то
 	else noiselevel = (maxsignal / 2);
 }
@@ -93,10 +93,10 @@ for (i = 0; i < (deltares-1); i++)
 	//чем ближе Noiselevel к Maxsignal тем хуже
 	
 	//ВРЕМЕННО ПОСТАВИМ на 3!!!!!!!!!!!!
-	noiselevel+=delta*2;
+	noiselevel+=delta*3;
 
 
-// printf("%s - Noise level = %05d (%05d) - Max sig %05d  Delta %05d  MED = %05d  LINOTKL=%05d\r", ntimestr, noiselevel, mediana+linotkl, maxsignal, delta, mediana, linotkl);
+printf("%s - Noise level = %05d (%05d) - Max sig %05d  Delta %05d  MED = %05d  LINOTKL=%05d\r", ntimestr, noiselevel, mediana+linotkl, maxsignal, delta, mediana, linotkl);
 
 
 return noiselevel;
