@@ -83,13 +83,16 @@ for (i = 0; i< deltares; i++)
 noiselevel = 0;
 for (i = 0; i < (deltares-1); i++)
 {
-	//разница между спектрами более чем 3 раза считаем за порог шума
-	//ставим уровень на пару delta выше
-	if( levels[i] > (levels[i+1]*2) ) { noiselevel = delta*(i+1); break; }
+	//разница между спектрами более чем 4 раза считаем за порог шума
+	if( levels[i] > (levels[i+1]*3) ) { noiselevel = delta*(i+1); break; }
 	//если такого порога нет то
 	else noiselevel = (maxsignal / 2);
 }
 
+	//чем уже вариативность сигнала тем больше дельт надо для превышения 1 над шумом
+	//чем ближе Noiselevel к Maxsignal тем хуже
+	
+	//ВРЕМЕННО ПОСТАВИМ на 3!!!!!!!!!!!!
 	noiselevel+=delta*2;
 
 

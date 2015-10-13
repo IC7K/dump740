@@ -117,7 +117,7 @@
         //декодирование ключевого кода
         okval = decodeKEY(m, j+pkkoffs, pkkpulselevel); // 6 - OK1, 0 - OK2, 5 - OK3, -1 - ERROR
 
-        if(okval == 0)
+        if(okval == 2)
         {
         printf("\n__________PROCESSING OK2 CODE__________\n");
         createOK2 (ok2koord, UVD_KOORD_KODE_LEN, 5000, 10);
