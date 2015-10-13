@@ -1,6 +1,6 @@
     //******************* OK1 **********************
 
-    if(((m[j+28]>=pulselevel+m[j+29])/2)>=pulselevel) {          
+    if(((m[j+28]>=pulselevel+m[j+29])/2)>=pulselevel) {       //KOORD KODE PKK3
     //OK1
     //t=8.5mks 110
     /*
@@ -119,8 +119,8 @@
 
         //START DECADE 1 - bits for positions
         //8*8=64 periods of 0.5mks
-        pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
-        dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        pkkoffs = pkkoffs + UVD_KEY_KODE_LEN; //93
+        dec1 = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
         //END DECADE 1
 
@@ -130,7 +130,7 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec2 = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec2 == (int) '*') continue; //11 или 00 вместо 10 или 01
         //END DECADE 2
 
@@ -139,7 +139,7 @@
         //START DECADE 3 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-        dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec3 = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec3 == (int) '*') continue; //11 или 00 вместо 10 или 01
         //END DECADE 3
 
@@ -149,7 +149,7 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec4 = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec4 == (int) '*') continue; //11 или 00 вместо 10 или 01
         //END DECADE 4
 
@@ -159,7 +159,7 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec5 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec5 = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec5 == (int) '*') continue; //11 или 00 вместо 10 или 01
         //END DECADE 5
 
@@ -167,7 +167,7 @@
         //REPEAT DECADES
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec1r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec1r = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec1r==-1) dec1r = (int) '*'; else //continue; //11 или 00 вместо 10 или 01
         // if(dec1r!=dec1) continue; 
         //END DECADE 1
@@ -176,7 +176,7 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec2r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec2r = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec2r==-1) dec2r = (int) '*'; else // continue; //11 или 00 вместо 10 или 01
         // if(dec2r!=dec2) continue;
         //END DECADE 2
@@ -185,7 +185,7 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec3r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec3r = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec3r==-1) dec3r = (int) '*'; else // continue; //11 или 00 вместо 10 или 01
         // if(dec3r!=dec3) continue;
         //END DECADE 3
@@ -194,7 +194,7 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec4r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec4r = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec4r==-1) dec4r = (int) '*'; else // continue; //11 или 00 вместо 10 или 01
         // if(dec4r!=dec4) continue;
         //END DECADE 4
@@ -203,7 +203,7 @@
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec5r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec5r = decodePKI16(m, pkkoffs, pkkpulselevel);
         // if(dec5r==-1) dec5r = (int) '*'; else // continue; //11 или 00 вместо 10 или 01
         // if(dec5r!=dec5) continue;
         //END DECADE 5
