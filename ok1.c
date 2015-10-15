@@ -1,6 +1,6 @@
     //******************* OK1 **********************
 
-    if(((m[j+28]>=pulselevel+m[j+29])/2)>=pulselevel) {       //KOORD KODE PKK3
+    if(((m[j+28]+m[j+29])/2)>=pulselevel) {       //KOORD KODE PKK3
     //OK1
     //t=8.5mks 110
     /*
