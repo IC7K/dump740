@@ -148,9 +148,10 @@ return -1;
 
 
 
-int decodeDECADE(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
+int decodeDECADE(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel, uint16_t *decoded, uint16_t decoffs) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;
 int result, b1, b2, b3, b4;//, b5, b6, b7, b8;
+int j;
 
 
 b1 = decodePKI16(m, pkkoffs,    pkkpulselevel);
@@ -171,13 +172,57 @@ b4 = decodePKI16(m, pkkoffs+48, pkkpulselevel);
 // b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 // printf("  END DECADE\n");
 
+for(j=0;j<128;j++) decoded[j]=0;
 
 result = 0;
 
-if(b1==1) result|=1;
-if(b2==1) result|=2;
-if(b3==1) result|=4;
-if(b4==1) result|=8;
+if(b1==1) {
+    result|=1;
+    //10
+    for (j=0+decoffs;j<8+decoffs; j++) decoded[j]=5000; //1
+    for (j=8+decoffs;j<16+decoffs;j++) decoded[j]=50;   //0
+} else if(b1==0) {
+    //01
+    for (j=0+decoffs;j<8+decoffs; j++) decoded[j]=50;   //0
+    for (j=8+decoffs;j<16+decoffs;j++) decoded[j]=5000; //1
+}
+
+
+if(b2==1) { 
+    result|=2;
+    //10
+    for (j=16+decoffs;j<24+decoffs; j++) decoded[j]=5000; //1
+    for (j=24+decoffs;j<32+decoffs; j++) decoded[j]=50;   //0
+} else if(b2==0) {
+    //01
+    for (j=16+decoffs;j<24+decoffs; j++) decoded[j]=50;   //0
+    for (j=24+decoffs;j<32+decoffs; j++) decoded[j]=5000; //1
+}
+
+
+if(b3==1) {
+    result|=4;
+    //10
+    for (j=32+decoffs;j<40+decoffs; j++) decoded[j]=5000; //1
+    for (j=40+decoffs;j<48+decoffs; j++) decoded[j]=50;   //0
+} else if(b3==0) {
+    //01
+    for (j=32+decoffs;j<40+decoffs; j++) decoded[j]=50;   //0
+    for (j=40+decoffs;j<48+decoffs; j++) decoded[j]=5000; //1
+}
+
+
+if(b4==1) {
+    result|=8;
+    //10
+    for (j=48+decoffs;j<56+decoffs; j++) decoded[j]=5000; //1
+    for (j=56+decoffs;j<64+decoffs; j++) decoded[j]=50;   //0
+} else if(b4==0) {
+    //01
+    for (j=48+decoffs;j<56+decoffs; j++) decoded[j]=50;   //0
+    for (j=56+decoffs;j<64+decoffs; j++) decoded[j]=5000; //1
+}
+
 
 if((b1==-1) || (b2==-1) || (b3==-1) || (b4==-1))
     {

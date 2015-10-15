@@ -1381,7 +1381,7 @@ uint okval;
 uint16_t ok1koord[10+92+10]; //UVD_KOORD_KODE_LEN];  //идеальная форма сигнала OK1 для сранения
 uint16_t ok2koord[UVD_KOORD_KODE_LEN];  //идеальная форма сигнала OK2 для сранения
 uint16_t ok3koord[UVD_KOORD_KODE_LEN];  //идеальная форма сигнала OK3 для сранения
-// uint16_t decade1_2[64+64];
+uint16_t decade1_2[64+64];
 
    
   //+++++++++++++++ TEST FILE LOAD ++++++++++++++++++++ 

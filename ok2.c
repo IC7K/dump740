@@ -129,22 +129,22 @@
         pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
         pkkpulselevel = pulselevel;
 
-        dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec2 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec3 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec3 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec4 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec4 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
@@ -160,25 +160,25 @@
         // следущее - это повторение
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec1r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec1r = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec1r==-1) continue; //11 или 00 вместо 10 или 01
         // if(dec1r!=dec1) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec2r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec2r = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec2r==-1) continue; //11 или 00 вместо 10 или 01
         // if(dec2r!=dec2) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec3r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec3r = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec3r==-1) continue; //11 или 00 вместо 10 или 01
         // if(dec3r!=dec3) continue; 
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec4r = decodeDECADE(m, pkkoffs, pkkpulselevel);
+        dec4r = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec4r==-1) continue; //11 или 00 вместо 10 или 01
         // if(dec4r!=dec4) continue; 
 
