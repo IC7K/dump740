@@ -102,9 +102,9 @@ b3 = decodePKI16(m, pkkoffs+32, pkkpulselevel);
 // p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
 // p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
 
-if((b1 == 1) && (b2 == 0) & (b3 == 1)) return 3; else
-if((b1 == 0) && (b2 == 0) & (b3 == 0)) return 2; else
-if((b1 == 1) && (b2 == 1) & (b3 == 0)) return 1; else
+if((b1 == 1) && (b2 == 0) && (b3 == 1)) return 3; else
+if((b1 == 0) && (b2 == 0) && (b3 == 0)) return 2; else
+if((b1 == 1) && (b2 == 1) && (b3 == 0)) return 1; else
 return -1;
 
 
