@@ -78,9 +78,9 @@
 #define UVD_OK2_OFFS            UVD_OK2_START+UVD_OK2_DELAY //22+28=50    //14mks высота топливо
 #define UVD_OK3_OFFS            UVD_OK3_START+UVD_OK3_DELAY //36+20=56    //10mks скорость
 
-#define UVD_POS_LEN             4/0.5   //4mks/0.5mks=8 perionds by 0.5mks
+#define UVD_POS_LEN             4/0.5           //4mks/0.5mks=8 perionds by 0.5mks
 #define UVD_RAZR_LEN            2*UVD_POS_LEN   //16 periods by 0.5 mks
-#define UVD_DECADE_LEN          4*UVD_RAZR_LEN    //64 periods by 0.5mks
+#define UVD_DECADE_LEN          4*UVD_RAZR_LEN  //64 periods by 0.5mks
 
 #define UVD_MAX_LEN             UVD_KOORD_KODE_LEN+UVD_KEY_KODE_LEN+UVD_OK2_DELAY+UVD_INFO_KODE_LEN
 
@@ -1382,11 +1382,7 @@ uint16_t ok1koord[10+92+10]; //UVD_KOORD_KODE_LEN];  //идеальная фор
 uint16_t ok2koord[UVD_KOORD_KODE_LEN];  //идеальная форма сигнала OK2 для сранения
 uint16_t ok3koord[UVD_KOORD_KODE_LEN];  //идеальная форма сигнала OK3 для сранения
 // uint16_t decade1_2[64+64];
-// uint windowlen;
-// char regnumber[6];
-// time_t t;
-// uint32_t hashval;
-// time_t now = time(NULL);
+
    
   //+++++++++++++++ TEST FILE LOAD ++++++++++++++++++++ 
   // uint16_t* marrwrite;

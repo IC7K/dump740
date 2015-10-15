@@ -21,10 +21,7 @@ int decodePKI16(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 if( (uint32_t )((m[pkkoffs]+m[pkkoffs+1])/2)>pkkpulselevel)    
     {
     //считаем код за 1
-    // maxlevel = 0;
-    // if(maxlevel<m[pkkoffs])   maxlevel = m[pkkoffs];
-    // if(maxlevel<m[pkkoffs+1]) maxlevel = m[pkkoffs+1];
-    // if(maxlevel<m[pkkoffs+2]) maxlevel = m[pkkoffs+2];
+
 
         //проверяем 0 во втором разряде, иначе ошибка!
         //0 код будет тогда, когда среднее за 8 периодов меньше макс уровня единицы
@@ -45,10 +42,7 @@ if( (uint32_t )((m[pkkoffs]+m[pkkoffs+1])/2)>pkkpulselevel)
 if((uint32_t )((m[pkkoffs+8]+m[pkkoffs+9])/2)>pkkpulselevel)       
    {
     //считаем код за 1
-    // maxlevel = 0;
-    // if(maxlevel<m[pkkoffs+8])  maxlevel = m[pkkoffs+8];
-    // if(maxlevel<m[pkkoffs+9])  maxlevel = m[pkkoffs+9];
-    // if(maxlevel<m[pkkoffs+10]) maxlevel = m[pkkoffs+10];
+
 
     //проверяем тогда 0 в первом разряде, иначе ошибка!
         if(decodeZERO8(m, pkkoffs, pkkpulselevel) == 1)
@@ -185,7 +179,7 @@ if(b2==1) result|=2;
 if(b3==1) result|=4;
 if(b4==1) result|=8;
 
-if(b1==-1 || b2==-1 || b3==-1 || b4==-1)
+if((b1==-1) || (b2==-1) || (b3==-1) || (b4==-1))
     {
         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
         result = (int) '*';
