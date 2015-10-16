@@ -172,7 +172,7 @@ b4 = decodePKI16(m, pkkoffs+48, pkkpulselevel);
 // b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
 // printf("  END DECADE\n");
 
-for(j=0;j<(64+decoffs);j++) decoded[j]=0;
+for(j=decoffs;j<(64+decoffs);j++) decoded[j]=0;
 
 result = 0;
 
