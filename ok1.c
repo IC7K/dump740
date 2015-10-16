@@ -119,7 +119,7 @@
 
         //START DECADE 1 - bits for positions
         //8*8=64 periods of 0.5mks
-        pkkoffs = j+pkkoffs + UVD_KEY_KODE_LEN; //93
+        pkkoffs = j + pkkoffs + UVD_KEY_KODE_LEN; //start decoding from j+93 position
         dec1_2_offs = pkkoffs;
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
@@ -130,7 +130,6 @@
         //START DECADE 2 - bits for positions
         //8*8=64 periods of 0.5mks
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
-
         dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 64);
         // if(dec2 == (int) '*') continue; //11 или 00 вместо 10 или 01
         //END DECADE 2
