@@ -1375,7 +1375,7 @@ uint32_t pulselevel, pkkpulselevel;
 uint32_t p1, p2, p3, p4, p5, p6;
 int dec1, dec2, dec3, dec4, dec5;
 int dec1r, dec2r, dec3r, dec4r, dec5r;
-uint32_t /*i,*/ j, pkkoffs;
+uint32_t /*i,*/ j, pkkoffs, dec1_2_offs;
 uint okval;
 
 uint16_t ok1koord[10+92+10]; //UVD_KOORD_KODE_LEN];  //идеальная форма сигнала OK1 для сранения

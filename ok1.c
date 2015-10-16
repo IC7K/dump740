@@ -119,7 +119,8 @@
 
         //START DECADE 1 - bits for positions
         //8*8=64 periods of 0.5mks
-        pkkoffs = pkkoffs + UVD_KEY_KODE_LEN; //93
+        pkkoffs = j+pkkoffs + UVD_KEY_KODE_LEN; //93
+        dec1_2_offs = pkkoffs;
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
         //END DECADE 1
@@ -135,7 +136,7 @@
         //END DECADE 2
 
         
-        oscilloscope(m, decade1_2, pkkoffs,  128, pulselevel, timestrok1); //10+92+10=112
+        oscilloscope(m, decade1_2, dec1_2_offs,  128, pulselevel, timestrok1); //10+92+10=112
 
 
         //START DECADE 3 - bits for positions
