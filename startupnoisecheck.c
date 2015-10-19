@@ -96,7 +96,10 @@ for (i = 0; i < (deltares-1); i++)
 	noiselevel+=delta*3;																	// 3 - PARAMETER!!!!!!!!!!!
 
 	//ограничение на шумоподобный сигнал ???
-	// if(noiselevel<750) noiselevel = 750;													// 750 - PARAMETER!!!!!!!!!!!
+	//отношение максигнал к шуму менее 2 дельта
+	if (abs(maxsignal-noiselevel) < (delta*2)) { noiselevel = maxsignal; }
+
+	
 
 	//брать среднее значение из нескольких последних??
 

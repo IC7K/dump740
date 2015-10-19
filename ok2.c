@@ -1,6 +1,6 @@
     //******************* OK2 **********************
 
-    if((uint32_t) ((m[j+21]+m[j+22]+m[j+23])/3)>pulselevel) {
+    if(((m[j+22]+m[j+23])/2)>=pulselevel) {
     //OK2
     //t=14mks 000
     /*
@@ -119,23 +119,28 @@
 
         if(okval == 2)
         {
+        
         printf("\n__________PROCESSING OK2 CODE__________\n");
-        createOK2 (ok2koord, UVD_KOORD_KODE_LEN, 5000, 10);
-        oscilloscope(m, ok2koord, j-10,  UVD_KOORD_KODE_LEN+20, pulselevel, timestrok2);
+
+        createOK2 (ok2koord, 97, 5000, 10); //[97]  т=21,5 мкс   t=7.5mks t=3.5 mks  
+        oscilloscope(m, ok2koord, j-10,  117, pulselevel, timestrok2); //10+97+10
 
     // oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
 
-
-        pkkoffs = pkkoffs + UVD_KEY_KODE_LEN;
-        pkkpulselevel = pulselevel;
+        pkkoffs = j + pkkoffs + UVD_KEY_KODE_LEN; //start decoding from j+93 position
+        dec1_2_offs = pkkoffs;        
 
         dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
+        dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 64);
         // if(dec2 == (int) '*') continue; //11 или 00 вместо 10 или 01
+
+        
+        oscilloscope(m, decade1_2, dec1_2_offs,  128, pulselevel, timestrok2);
+
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
@@ -149,7 +154,7 @@
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec5 = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
+        dec5 = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec5 == -1) continue; //11 или 00 вместо 10 или 01
 
         int fuel = (dec5<10) ? dec5*5 : (dec5-5)*10;
@@ -184,7 +189,7 @@
 
         pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
 
-        dec5r = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel);
+        dec5r = decodeDECADEFUEL(m, pkkoffs, pkkpulselevel, decade1_2, 0);
         // if(dec5r==-1) continue; //11 или 00 вместо 10 или 01
         // if(dec5r!=dec5) continue; 
 

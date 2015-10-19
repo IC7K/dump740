@@ -109,7 +109,7 @@
 
         printf("\n__________PROCESSING OK1 CODE__________\n");
         
-        createOK1   (ok1koord,            92,    5000, 10); //KOORD+DELAY1+KEY
+        createOK1   (ok1koord,            92,    5000, 10); //[92]  т=21,5 мкс   t=7.5mks t=3.5 mks    KOORD+DELAY1+KEY
         oscilloscope(m, ok1koord, j-10,  112, pulselevel, timestrok1); //10+92+10=112
     
     // oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
