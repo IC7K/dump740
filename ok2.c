@@ -122,10 +122,11 @@
         
         printf("\n__________PROCESSING OK2 CODE__________\n");
 
+        //uint16_t ok2koord[10+97+10];  //идеальная форма сигнала OK2 для сранения
         createOK2 (ok2koord, 97, 5000, 10); //[97]  т=21,5 мкс   t=7.5mks t=3.5 mks  
         oscilloscope(m, ok2koord, j-10,  117, pulselevel, timestrok2); //10+97+10
 
-    // oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
+        // oscilloscope(ok2koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
 
         pkkoffs = j + pkkoffs + UVD_KEY_KODE_LEN; //start decoding from j+93 position
         dec1_2_offs = pkkoffs;        

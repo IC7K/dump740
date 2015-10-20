@@ -109,10 +109,11 @@
 
         printf("\n__________PROCESSING OK1 CODE__________\n");
         
+        //uint16_t ok1koord[10+92+10]; //UVD_KOORD_KODE_LEN];  //идеальная форма сигнала OK1 для сранения
         createOK1   (ok1koord,            92,    5000, 10); //[92]  т=21,5 мкс   t=7.5mks t=3.5 mks    KOORD+DELAY1+KEY
         oscilloscope(m, ok1koord, j-10,  112, pulselevel, timestrok1); //10+92+10=112
     
-    // oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
+        // oscilloscope(ok1koord, 0,  UVD_KOORD_KODE_LEN, pulselevel); 
 
 
         //DECODE INFO CODE - BORT NUMBER  RF- D5 D4 D3 D2 D1
