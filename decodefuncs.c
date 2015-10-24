@@ -90,8 +90,9 @@ return -1;
 
 int decodeDECADE(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel, uint16_t *decoded, uint16_t decoffs) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;
-int result, b1, b2, b3, b4;//, b5, b6, b7, b8;
+int b1, b2, b3, b4;//, b5, b6, b7, b8;
 int j;
+uint result;
 
 
 b1 = decodePKI16(m, pkkoffs,    pkkpulselevel);
@@ -155,10 +156,10 @@ if(b4==1) {
 if((b1==-1) || (b2==-1) || (b3==-1) || (b4==-1))
     {
         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
-        result = (int) '*';
+        result = (uint) '*';
     }
     //ошибки нет
-    else    result+=(int) '0';    
+    else    result+=(uint) '0';    
 // else
 //     {
 //         result = 0;
@@ -173,9 +174,9 @@ return result;
 
 int decodeDECADEFUEL(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel, uint16_t *decoded, uint16_t decoffs) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;
-int result, b1, b2, b3, b4;//, b5, b6, b7, b8;
+int b1, b2, b3, b4;//, b5, b6, b7, b8;
 int j;
-
+uint result;
 
 b1 = decodePKI16(m, pkkoffs,    pkkpulselevel);
 b2 = decodePKI16(m, pkkoffs+16, pkkpulselevel);
@@ -250,10 +251,10 @@ if(b4==1) {
 if((b1==-1) || (b2==-1) || (b3==-1) || (b4==-1))
     {
         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
-        result = (int) '*';
+        result = (uint) '*';
     }
     //ошибки нет
-    else    result+=(int) '0';    
+    else    result+=(uint) '0';    
 // else
 //     {
 //         result = 0;

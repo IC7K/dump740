@@ -135,40 +135,24 @@
         createOK3   (ok3koord,            103,    5000, 10); //[92]  т=21,5 мкс   t=7.5mks t=3.5 mks    KOORD+DELAY1+KEY
         oscilloscope(m, ok3koord, j-10,  123, pulselevel, timestrok3); //10+92+10=112
 
-            // printf("\n%s - OK3 OK RKK=101 [%d>%d - %d<%d - %d>%d] %d>%d OK3VAL(5)=%d\n",
-            //     timestr,
-            //     m[j+pkkoffs]+m[j+pkkoffs+1]+m[j+pkkoffs+2]+m[j+pkkoffs+3]+m[j+pkkoffs+4]+m[j+pkkoffs+5]+m[j+pkkoffs+6]+m[j+pkkoffs+7],
-            //     m[j+pkkoffs+8]+m[j+pkkoffs+9]+m[j+pkkoffs+10]+m[j+pkkoffs+11]+m[j+pkkoffs+12]+m[j+pkkoffs+13]+m[j+pkkoffs+14]+m[j+pkkoffs+15],
-            //     m[j+pkkoffs+16]+m[j+pkkoffs+17]+m[j+pkkoffs+18]+m[j+pkkoffs+19]+m[j+pkkoffs+20]+m[j+pkkoffs+21]+m[j+pkkoffs+22]+m[j+pkkoffs+23],
-            //     m[j+pkkoffs+24]+m[j+pkkoffs+25]+m[j+pkkoffs+26]+m[j+pkkoffs+27]+m[j+pkkoffs+28]+m[j+pkkoffs+29]+m[j+pkkoffs+30]+m[j+pkkoffs+31],
-            //     m[j+pkkoffs+32]+m[j+pkkoffs+33]+m[j+pkkoffs+34]+m[j+pkkoffs+35]+m[j+pkkoffs+36]+m[j+pkkoffs+37]+m[j+pkkoffs+38]+m[j+pkkoffs+39],
-            //     m[j+pkkoffs+40]+m[j+pkkoffs+41]+m[j+pkkoffs+42]+m[j+pkkoffs+43]+m[j+pkkoffs+44]+m[j+pkkoffs+45]+m[j+pkkoffs+46]+m[j+pkkoffs+47],
-            //     m[j],
-            //     pulselevel,
-            //     okval
-            //     // mediana
-            //     );
+        pkkoffs = j + pkkoffs + UVD_KEY_KODE_LEN; //start decoding from j+93 position
+        dec1_2_offs = pkkoffs;        
+
+        ok3dec1 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 0);
+        // if(dec1 == (int) '*') continue; //11 или 00 вместо 10 или 01
+
+        pkkoffs = pkkoffs + UVD_DECADE_LEN; //+64 periods by 0.5mks
+
+        ok3dec2 = decodeDECADE(m, pkkoffs, pkkpulselevel, decade1_2, 64);
+        // if(dec2 == (int) '*') continue; //11 или 00 вместо 10 или 01
+
+        
+        oscilloscope(m, decade1_2, dec1_2_offs,  128, pulselevel, timestrok2);
 
 
 
-
-
-
-
-            // uint16_t marwrite[UVD_MAX_LEN];
-
-            // for(i=0;i<UVD_MAX_LEN;i++) {
-            // marwrite[i] = m[j+i];
-            // }
-
-            // sprintf(filestr, "ok3-%02d-%02d-%02d-%03d.data", (int) t->tm_hour, (int) t->tm_min, (int) t->tm_sec, (int) tp.tv_usec/1000);
-            // FILE *f = fopen(filestr, "wb");
-            // fwrite(marwrite, sizeof(uint16_t), sizeof(marwrite), f);
-            // fclose(f);
-
-
-            j+=UVD_KOORD_KODE_LEN+UVD_OK3_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
-            continue;
+        j+=UVD_KOORD_KODE_LEN+UVD_OK3_DELAY+UVD_KEY_KODE_LEN+UVD_INFO_KODE_LEN;
+        continue;
         }
             // else printf("OK3 BAD RKK\n");          
 

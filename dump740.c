@@ -1373,8 +1373,16 @@ char timestrnoise[20], timestrok1[20], timestrok2[20], timestrok3[20];
 uint32_t pulselevel, pkkpulselevel;
 // uint32_t b1, b2, b3, b4, b5, b6, b7, b8;
 uint32_t p1, p2, p3, p4, p5, p6;
-int dec1, dec2, dec3, dec4, dec5;
-int dec1r, dec2r, dec3r, dec4r, dec5r;
+
+int ok1dec1, ok1dec2, ok1dec3, ok1dec4, ok1dec5;
+int ok1dec1r, ok1dec2r, ok1dec3r, ok1dec4r, ok1dec5r;
+
+int ok2dec1, ok2dec2, ok2dec3, ok2dec4, ok2dec5;
+int ok2dec1r, ok2dec2r, ok2dec3r, ok2dec4r, ok2dec5r;
+
+int ok3dec1, ok3dec2, ok3dec3, ok3dec4, ok3dec5;
+int ok3dec1r, ok3dec2r, ok3dec3r, ok3dec4r, ok3dec5r;
+
 uint32_t /*i,*/ j, pkkoffs, dec1_2_offs;
 uint okval;
 
