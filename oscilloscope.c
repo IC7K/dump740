@@ -244,12 +244,116 @@ void createOK1 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 
 void createOK2 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 	uint i;
+    /*
+    [23]  т=0,5 мкс       
+    [24]  т=1 мкс       
+    [25]  т=1,5 мкс               
+    [26]  т=2 мкс       
+    [27]  т=2,5 мкс       
+    [28]  т=3 мкс   
+    [29]  т=3,5 мкс       
+    [30]  т=4 мкс       
+    [31]  т=4,5 мкс
+    [32]  т=5 мкс       
+    [33]  т=5.5 мкс       
+    [34]  т=6 мкс               
+    [35]  т=6.5 мкс       
+    [36]  т=7 мкс       
+    [37]  т=7.5 мкс   
+    [38]  т=8 мкс       
+    [39]  т=8.5 мкс       
+    [40]  т=9 мкс          
+    [41]  т=9.5 мкс               
+    [42]  т=10 мкс       
+    [43]  т=10.5 мкс       
+    [44]  т=11 мкс   
+    [45]  т=11.5 мкс       
+    [46]  т=12 мкс       
+    [47]  т=12.5 мкс     
+    [48]  т=13 мкс               
+    [49]  т=13.5 мкс   
 
+    ---РКИ1 =0
+    -----POS1 =0 SUMM(50-57)<SUMM(58-65)
+    [50]  т=14 мкс     t=0 mks
+    [51]  т=14.5 мкс   t=0.5 mks       
+    [52]  т=15 мкс     t=1 mks  
+    [53]  т=15,5 мкс   t=1.5 mks  
+    [54]  т=16 мкс     t=2 mks
+    [55]  т=16,5 мкс   t=2.5 mks
+    [56]  т=17 мкс     t=3 mks
+    [57]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [58]  т=18 мкс     t=4mks   t=0 mks
+    [59]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [60]  т=19 мкс     t=5mks   t=1 mks  
+    [61]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [62]  т=20 мкс     t=6mks   t=2 mks
+    [63]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [64]  т=21 мкс     t=7mks   t=3 mks
+    [65]  т=21,5 мкс   t=7.5mks t=3.5 mks
+
+    ---РКИ2 =0   
+    -----POS1 =0 SUMM(66-73)<SUMM(74-81)
+    [66]  т=14 мкс     t=0 mks
+    [67]  т=14.5 мкс   t=0.5 mks       
+    [68]  т=15 мкс     t=1 mks  
+    [69]  т=15,5 мкс   t=1.5 mks  
+    [70]  т=16 мкс     t=2 mks
+    [71]  т=16,5 мкс   t=2.5 mks
+    [72]  т=17 мкс     t=3 mks
+    [73]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [74]  т=18 мкс     t=4mks   t=0 mks
+    [75]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [76]  т=19 мкс     t=5mks   t=1 mks  
+    [77]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [78]  т=20 мкс     t=6mks   t=2 mks
+    [79]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [80]  т=21 мкс     t=7mks   t=3 mks
+    [81]  т=21,5 мкс   t=7.5mks t=3.5 mks
+
+    ---РКИ3 =0   
+    -----POS1 =0 SUMM(82-89)<SUMM(90-97)
+    [82]  т=14 мкс     t=0 mks
+    [83]  т=14.5 мкс   t=0.5 mks       
+    [84]  т=15 мкс     t=1 mks  
+    [85]  т=15,5 мкс   t=1.5 mks  
+    [86]  т=16 мкс     t=2 mks
+    [87]  т=16,5 мкс   t=2.5 mks
+    [88]  т=17 мкс     t=3 mks
+    [89]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [90]  т=18 мкс     t=4mks   t=0 mks
+    [91]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [92]  т=19 мкс     t=5mks   t=1 mks  
+    [93]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [94]  т=20 мкс     t=6mks   t=2 mks
+    [95]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [96]  т=21 мкс     t=7mks   t=3 mks
+    [97]  т=21,5 мкс   t=7.5mks t=3.5 mks    
+
+    ---РКИ1 =0
+    -----POS1 =0 SUMM(50-57)<SUMM(58-65)  
+    ---РКИ2 =0   
+    -----POS1 =0 SUMM(66-73)<SUMM(74-81)
+    ---РКИ3 =0   
+    -----POS1 =0 SUMM(82-89)<SUMM(90-97)                
+    */     
 	oklen = oklen + beforeafter*2;
 	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0+beforeafter]=maxval; m[1+beforeafter]=100; m[2+beforeafter]=100;	//формируем импульс 1,5мкс
-	m[22+beforeafter]=maxval; m[23+beforeafter]=100; m[24+beforeafter]=100; //формируем импульс 1,5мкс
+	m[0+beforeafter]=maxval; m[1+beforeafter]=maxval; m[2+beforeafter]=maxval;	//формируем импульс 1,5мкс
+	m[22+beforeafter]=maxval; m[23+beforeafter]=maxval; m[24+beforeafter]=maxval; //формируем импульс 1,5мкс
+
+	for (i=50; i<58; i++)	m[i+beforeafter]=50; //0
+	for (i=58; i<66; i++)	m[i+beforeafter]=maxval;	 //0 = 01
+
+	for (i=66; i<74; i++)	m[i+beforeafter]=50; //0
+	for (i=74; i<82; i++)	m[i+beforeafter]=maxval;	 //0 = 01
+
+	for (i=82; i<90; i++)	m[i+beforeafter]=50; //0
+	for (i=90; i<98; i++)	m[i+beforeafter]=maxval; 	//1 = 01		
 }
 
 
@@ -257,9 +361,108 @@ void createOK2 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 void createOK3 (uint16_t *m, uint oklen, uint maxval, uint beforeafter) {
 	uint i;
 
+    /*
+    [37]  т=0,5 мкс       
+    [38]  т=1 мкс       
+    [39]  т=1,5 мкс               
+    [40]  т=2 мкс       
+    [41]  т=2,5 мкс       
+    [42]  т=3 мкс   
+    [43]  т=3,5 мкс       
+    [44]  т=4 мкс       
+    [45]  т=4,5 мкс
+    [46]  т=5 мкс       
+    [47]  т=5.5 мкс       
+    [48]  т=6 мкс               
+    [49]  т=6.5 мкс       
+    [50]  т=7 мкс       
+    [51]  т=7.5 мкс   
+    [52]  т=8 мкс       
+    [53]  т=8.5 мкс       
+    [54]  т=9 мкс          
+    [55]  т=9.5 мкс               
+
+
+    ---РКИ1 =1
+    -----POS1 =1 SUMM(56-63)>SUMM(64-71)
+    [56]  т=14 мкс     t=0 mks
+    [57]  т=14.5 мкс   t=0.5 mks       
+    [58]  т=15 мкс     t=1 mks  
+    [59]  т=15,5 мкс   t=1.5 mks  
+    [60]  т=16 мкс     t=2 mks
+    [61]  т=16,5 мкс   t=2.5 mks
+    [62]  т=17 мкс     t=3 mks
+    [63]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =0   
+    [64]  т=18 мкс     t=4mks   t=0 mks
+    [65]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [66]  т=19 мкс     t=5mks   t=1 mks  
+    [67]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [68]  т=20 мкс     t=6mks   t=2 mks
+    [69]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [70]  т=21 мкс     t=7mks   t=3 mks
+    [71]  т=21,5 мкс   t=7.5mks t=3.5 mks
+
+    ---РКИ2 =0   
+    -----POS1 =0 SUMM(72-79)<SUMM(80-87)
+    [72]  т=14 мкс     t=0 mks
+    [73]  т=14.5 мкс   t=0.5 mks       
+    [74]  т=15 мкс     t=1 mks  
+    [75]  т=15,5 мкс   t=1.5 mks  
+    [76]  т=16 мкс     t=2 mks
+    [77]  т=16,5 мкс   t=2.5 mks
+    [78]  т=17 мкс     t=3 mks
+    [79]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =1   
+    [80]  т=18 мкс     t=4mks   t=0 mks
+    [81]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [82]  т=19 мкс     t=5mks   t=1 mks  
+    [83]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    [84]  т=20 мкс     t=6mks   t=2 mks
+    [85]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    [86]  т=21 мкс     t=7mks   t=3 mks
+    [87]  т=21,5 мкс   t=7.5mks t=3.5 mks
+
+    ---РКИ3 =1   
+    -----POS1 =1 SUMM(88-95)>SUMM(96-103)   
+    [88]  т=14 мкс     t=0 mks
+    [89]  т=14.5 мкс   t=0.5 mks       
+    [90]  т=15 мкс     t=1 mks  
+    [91]  т=15,5 мкс   t=1.5 mks  
+    [92]  т=16 мкс     t=2 mks
+    [93]  т=16,5 мкс   t=2.5 mks
+    [94]  т=17 мкс     t=3 mks
+    [95]  т=17,5 мкс   t=3.5 mks
+    -----POS2 =0
+    [96]  т=18 мкс     t=4mks   t=0 mks
+    [97]  т=18.5 мкс   t=4.5mks t=0.5 mks       
+    [98]  т=19 мкс     t=5mks   t=1 mks  
+    [99]  т=19,5 мкс   t=5.5mks t=1.5 mks  
+    100]  т=20 мкс     t=6mks   t=2 mks
+    101]  т=20,5 мкс   t=6.5mks t=2.5 mks
+    102]  т=21 мкс     t=7mks   t=3 mks
+    103]  т=21,5 мкс   t=7.5mks t=3.5 mks    
+
+    ---РКИ1 =1
+    -----POS1 =1 SUMM(56-63)>SUMM(64-71)
+    ---РКИ2 =0   
+    -----POS1 =0 SUMM(72-79)<SUMM(80-87)
+    ---РКИ3 =1   
+    -----POS1 =1 SUMM(88-95)>SUMM(96-103)                      
+    */
+
 	oklen = oklen + beforeafter*2;
 	for(i=0; i<oklen; i++) m[i]=0;
 
-	m[0+beforeafter]=maxval; m[1+beforeafter]=100; m[2+beforeafter]=100;	//формируем импульс 1,5мкс
-	m[36+beforeafter]=maxval; m[37+beforeafter]=100; m[38+beforeafter]=100; //формируем импульс 1,5мкс
+	m[0+beforeafter]=maxval; m[1+beforeafter]=maxval; m[2+beforeafter]=maxval;	//формируем импульс 1,5мкс
+	m[36+beforeafter]=maxval; m[37+beforeafter]=maxval; m[38+beforeafter]=maxval; //формируем импульс 1,5мкс
+
+	for (i=56; i<64; i++)	m[i+beforeafter]=maxval; //1
+	for (i=64; i<72; i++)	m[i+beforeafter]=50;	 //0 = 01
+
+	for (i=72; i<80; i++)	m[i+beforeafter]=50; //0
+	for (i=80; i<88; i++)	m[i+beforeafter]=maxval;	 //0 = 01
+
+	for (i=88; i<96; i++)	m[i+beforeafter]=maxval; //1
+	for (i=96; i<104; i++)	m[i+beforeafter]=50; 	//1 = 01		
 }

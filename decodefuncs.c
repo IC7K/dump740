@@ -64,25 +64,6 @@ return -1;
 
 
 
-
-
-// uint32_t decodePOSRAW(uint16_t *m, uint32_t pkkoffs) {
-
-// return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7]); 
-
-// } //end decodePOS
-// uint decodePOSPrint(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
-
-// // printf("%d%d%d%d%d%d%d%d",m[pkkoffs],m[pkkoffs+1],m[pkkoffs+2],m[pkkoffs+3],m[pkkoffs+4],m[pkkoffs+5],m[pkkoffs+6],m[pkkoffs+7]);
-// printf("%d", (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0);
-// return (uint32_t) (m[pkkoffs]+m[pkkoffs+1]+m[pkkoffs+2]+m[pkkoffs+3]+m[pkkoffs+4]+m[pkkoffs+5]+m[pkkoffs+6]+m[pkkoffs+7])/8 > pkkpulselevel ? 1 : 0; 
-
-// } //end decodePOS
-
-
-
-
-
 // 1(6) - OK1, 2(0) - OK2, 3(5) - OK3
 int decodeKEY(uint16_t *m, uint32_t pkkoffs, uint32_t pkkpulselevel) {
 // uint32_t pkkmediana, pkkpulselevel, i, pkkend;    
@@ -95,53 +76,12 @@ b1 = decodePKI16(m, pkkoffs,    pkkpulselevel);
 b2 = decodePKI16(m, pkkoffs+16, pkkpulselevel);
 b3 = decodePKI16(m, pkkoffs+32, pkkpulselevel);
 
-// p1 = decodePOS(m, pkkoffs,    pkkpulselevel);
-// p2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
-// p3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
-// p4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
-// p5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
-// p6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
-
 if((b1 == 1) && (b2 == 0) && (b3 == 1)) return 3; else
 if((b1 == 0) && (b2 == 0) && (b3 == 0)) return 2; else
 if((b1 == 1) && (b2 == 1) && (b3 == 0)) return 1; else
 return -1;
 
 
-// 6 - OK1, 0 - OK2, 5 - OK3, -1 - ERROR
-
-        // if( //101 OK3
-        //     p1>p2 &&    //10
-        //     p3<p4 &&    //01
-        //     p5>p6       //10
-        //   ) return 5; else
-
-        // if( //000 OK2
-        //     p1<p2 &&    //01
-        //     p3<p4 &&    //01
-        //     p5<p6       //01
-        //   ) return 0; else
-
-        // if( //110 OK1
-        //     p1>p2 &&    //10
-        //     p3>p4 &&    //10
-        //     p5<p6       //01
-        //   ) return 6; else
-
-        // //ДРУГИХ КОМБИНАЦИЙ НЕТ (ЗК4 на будущее)
-        // return -1;
-
-// if(p1==p2 || p3==p4 || p5==p6)
-//     {
-//         //ошибка в кодировании 1 или 0 - должно быть или 10 или 01, но не 11 или 00
-//         result = -1;
-//     }
-// else
-//     {
-//         result = 0;
-//         result = ((p1 < p2) ? 0 : 4) | ((p3 < p4) ? 0 : 2) | ((p5 < p6) ? 0 : 1);
-//     }
-// return result; 
 
 } //end decodeKEY
 
@@ -159,18 +99,6 @@ b2 = decodePKI16(m, pkkoffs+16, pkkpulselevel);
 b3 = decodePKI16(m, pkkoffs+32, pkkpulselevel);
 b4 = decodePKI16(m, pkkoffs+48, pkkpulselevel);
 
-// b1 = decodePOS(m, pkkoffs,    pkkpulselevel);
-// b2 = decodePOS(m, pkkoffs+8,  pkkpulselevel);
-// // printf(" ");
-// b3 = decodePOS(m, pkkoffs+16, pkkpulselevel);
-// b4 = decodePOS(m, pkkoffs+24, pkkpulselevel);
-// // printf(" ");
-// b5 = decodePOS(m, pkkoffs+32, pkkpulselevel);
-// b6 = decodePOS(m, pkkoffs+40, pkkpulselevel);
-// // printf(" ");
-// b7 = decodePOS(m, pkkoffs+48, pkkpulselevel);
-// b8 = decodePOS(m, pkkoffs+56, pkkpulselevel);
-// printf("  END DECADE\n");
 
 for(j=decoffs;j<(64+decoffs);j++) decoded[j]=0;
 
