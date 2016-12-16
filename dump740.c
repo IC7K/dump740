@@ -2576,7 +2576,7 @@ int main(int argc, char **argv) {
 
 
 
-    while(getchar() != 32 || getchar() != ' ') {
+    while(1) {
         if (!Modes.data_ready) {
             pthread_cond_wait(&Modes.data_cond,&Modes.data_mutex);
             continue;
@@ -2600,7 +2600,7 @@ int main(int argc, char **argv) {
 
         backgroundTasks();
         pthread_mutex_lock(&Modes.data_mutex);
-        if (Modes.exit) break;
+        if (Modes.exit || getchar() != 32 || getchar() != ' ') break;
     }
 
 
