@@ -2573,7 +2573,10 @@ int main(int argc, char **argv) {
 
     // int counternoise = 0;
 
-    while(1) {
+
+
+
+    while(getchar() != 32 || getchar() != ' ') {
         if (!Modes.data_ready) {
             pthread_cond_wait(&Modes.data_cond,&Modes.data_mutex);
             continue;
@@ -2599,6 +2602,10 @@ int main(int argc, char **argv) {
         pthread_mutex_lock(&Modes.data_mutex);
         if (Modes.exit) break;
     }
+
+
+
+
 
     /* If --ifile and --stats were given, print statistics. */
     if (Modes.stats && Modes.filename) {
