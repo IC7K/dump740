@@ -48,6 +48,12 @@
 #include "rtl-sdr.h"
 #include "anet.h"
 
+//Запись в файл
+// rtl_sdr -f 740000000 -s 2000000 -g 48.0 output.bin
+// In the example rtl_sdr a gain of 50 is used, simply you should use the highest gain availabe for your tuner.
+// This is not needed when calling Dump1090 itself as it is able to select the highest gain supported automatically.
+// It is possible to feed the program with data via standard input using the --ifile option with "-" as argument.
+
 #define MODES_DEFAULT_RATE         2000000 //разрешение 0.5мкс
 #define MODES_DEFAULT_FREQ         740000000
 #define MODES_DEFAULT_WIDTH        1000
